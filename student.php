@@ -2,16 +2,18 @@
 session_start();
 
 // Check if the user is logged in
-if (!isset($_SESSION['email'])) {
+if (!isset($_SESSION['userid'])) {
     echo "You must log in first";
     exit;
 }
 
 require 'utils/connect.php';
 
-$email = $_SESSION['email'];
+$email = $_SESSION['userid'];
 
-$sql = "SELECT * FROM students WHERE email = '$email'";
+$sql = "SELECT students.* FROM students
+        JOIN users ON students.user_id = users.user_id
+        WHERE users.email = '$email'";
 $result = $conn->query($sql);
 ?>
 
