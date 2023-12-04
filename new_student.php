@@ -50,6 +50,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "${stu_result}";
 
     echo "Student created successfully<br>";
+
+    // Redirect to student page
+    $_SESSION["user_id"]=$user_id;
+    $_SESSION["password"]=$password;
+    $_SESSION["is_admin"]=false;
+    header("Location: student.php");
+
+
     
     /* $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
     $result = $conn->query($sql);
