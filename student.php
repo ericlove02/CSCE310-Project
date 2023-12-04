@@ -7,7 +7,7 @@ if (!isset($_SESSION['email'])) {
     exit;
 }
 
-require 'connect.php';
+require 'utils/connect.php';
 
 $email = $_SESSION['email'];
 
@@ -17,9 +17,11 @@ $result = $conn->query($sql);
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>Student Information</title>
 </head>
+
 <body>
     <table>
         <tr>
@@ -30,8 +32,8 @@ $result = $conn->query($sql);
         <?php
         if ($result->num_rows > 0) {
             // output data of each row
-            while($row = $result->fetch_assoc()) {
-                echo "<tr><td>" . $row["name"]. "</td><td>" . $row["email"]. "</td><td>" . $row["program"]. "</td></tr>";
+            while ($row = $result->fetch_assoc()) {
+                echo "<tr><td>" . $row["name"] . "</td><td>" . $row["email"] . "</td><td>" . $row["program"] . "</td></tr>";
             }
         } else {
             echo "<tr><td colspan='3'>No results</td></tr>";
@@ -40,4 +42,5 @@ $result = $conn->query($sql);
         ?>
     </table>
 </body>
+
 </html>
