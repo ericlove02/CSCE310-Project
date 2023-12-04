@@ -1,7 +1,7 @@
 <?php
 $servername = "localhost";  // Usually "localhost" if the database is on the same server as your PHP script
-$username = "root";
-$password = "";
+$username = "root"; // user for server: id21543832_root
+$password = ""; // pw for server: Password1!
 $dbname = "id21543832_data";
 
 // Create connection
@@ -12,6 +12,6 @@ if ($conn->connect_error) {
     die("Connection failed: " . $conn->connect_error);
 }
 
-echo "Connected successfully";
+// echo "Connected successfully";
 
 ?>
