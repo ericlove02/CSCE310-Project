@@ -52,13 +52,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Student created successfully<br>";
 
     // Redirect to student page
-    $_SESSION["user_id"]=$user_id;
-    $_SESSION["password"]=$password;
-    $_SESSION["is_admin"]=false;
+    $_SESSION["user_id"] = $user_id;
+    $_SESSION["password"] = $password;
+    $_SESSION["is_admin"] = false;
     header("Location: student.php");
 
 
-    
+
     /* $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
     $result = $conn->query($sql);
 
@@ -84,9 +84,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $conn->close();
 
 
-function checkboxToInt($val) {
+function checkboxToInt($val)
+{
     //$val_type = gettype($val);
-    if(is_null($val)) {
+    if (is_null($val)) {
         return 0;
     } else {
         return 1;
@@ -95,11 +96,13 @@ function checkboxToInt($val) {
 
 
 // UI generators
-function createInput($key, $label) {
+function createInput($key, $label)
+{
     echo "${label}: <input type=\"text\" name=\"${key}\"><br>";
 }
 
-function createCheckbox($key, $label) {
+function createCheckbox($key, $label)
+{
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
 }
 
@@ -108,36 +111,37 @@ function createCheckbox($key, $label) {
 <!DOCTYPE html>
 <html>
 
-    <body>
+<body>
+
+    <form method="post">
+        <?php
+        createInput("email", "Email");
+        createInput("f_name", "First Name");
+        createInput("l_name", "Last Name");
+        createInput("m_initial", "Middle Initial");
+        createInput("phone", "Phone");
+        createInput("password", "Password");
+        // is_admin
         
-<form method="post">
-<?php
-createInput("email", "Email");
-createInput("f_name", "First Name");
-createInput("l_name", "Last Name");
-createInput("m_initial", "Middle Initial");
-createInput("phone", "Phone");
-createInput("password", "Password");
-// is_admin
+        // student stuff
+        createInput("stu_gender", "Gender");
+        createCheckbox("stu_hisp_latino", "Hispanic?");
+        createCheckbox("stu_uscitizen", "US Citizen?");
+        createCheckbox("stu_firstgen", "First generation college student?");
 
-// student stuff
-createInput("stu_gender", "Gender");
-createCheckbox("stu_hisp_latino", "Hispanic?");
-createCheckbox("stu_uscitizen", "US Citizen?");
-createCheckbox("stu_firstgen", "First generation college student?");
-
-createInput("stu_dob", "Date of Birth");
-createInput("stu_discord", "Discord username");
-createInput("stu_school", "School");
-createInput("stu_classification", "Student classification");
-createInput("stu_grad_expect", "Expected graduation date");
-createInput("stu_major", "Student major");
-createInput("stu_major2", "Student major 2");
-createInput("stu_minor", "Student minor");
-?>
+        createInput("stu_dob", "Date of Birth");
+        createInput("stu_discord", "Discord username");
+        createInput("stu_school", "School");
+        createInput("stu_classification", "Student classification");
+        createInput("stu_grad_expect", "Expected graduation date");
+        createInput("stu_major", "Student major");
+        createInput("stu_major2", "Student major 2");
+        createInput("stu_minor", "Student minor");
+        ?>
 
 
-<input type="submit">
-</form>
+        <input type="submit">
+    </form>
 </body>
-    </html>
+
+</html>
