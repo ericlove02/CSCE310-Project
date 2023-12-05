@@ -55,7 +55,7 @@ $conn->close();
 
     <br>
 
-    <a href="new_students.php"><button>Apply</button></a>
+    <a href="new_student.php"><button>Sign Up</button></a>
 </body>
 
 </html>
