@@ -86,11 +86,13 @@ function checkboxToInt($val)
 // UI generators
 function createInput($key, $label)
 {
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"text\" name=\"${key}\"><br>";
 }
 
 function createCheckbox($key, $label)
 {
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"checkbox\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
 }
 
