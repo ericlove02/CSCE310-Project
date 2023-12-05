@@ -14,6 +14,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $phone = $_POST["phone"]; // Phone
     $password = $_POST["password"]; // Password
 
+    $stu_uin = $_POST["stu_uin"]; // UIN
     $stu_gender = $_POST["stu_gender"]; // Gender
     $stu_hisp_latino = checkboxToInt(@$_POST["stu_hisp_latino"]); // Hispanic?
     $stu_uscitizen = checkboxToInt(@$_POST["stu_uscitizen"]); // US Citizen?
@@ -27,7 +28,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stu_major = $_POST["stu_major"]; // Student major
     $stu_major2 = $_POST["stu_major2"]; // Student major 2
     $stu_minor = $_POST["stu_minor"]; // Student minor
+    $stu_minor2 = $_POST["stu_minor2"]; // Student minor 2
 
+    $stu_gpa = $_POST["stu_gpa"]; // Student gpa
+    $stu_in_rotc = checkBoxToInt(@$_POST["stu_in_rotc"]); // Student in rotc
+    $stu_in_corp = checkBoxToInt(@$_POST["stu_in_corp"]); // Student in corps
+    $stu_in_cyber_club = checkBoxToInt(@$_POST["stu_in_cyber_club"]); // Student in cs club
+    $stu_in_women_cyber = checkBoxToInt(@$_POST["stu_in_women_cyber"]); // Student in women in cybersec
     // Make sure there are no other users with the same email
 
     $has_existing_user = $conn->query("SELECT * FROM users WHERE email = '$email'");
@@ -38,14 +45,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // create the user
-    $conn->execute_query("INSERT INTO Users(email, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,FALSE)", [$email, $f_name, $l_name, $m_initial, $phone]);
+    $conn->execute_query("INSERT INTO Users(email, password, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,?,FALSE)", [$email, $password, $f_name, $l_name, $m_initial, $phone]);
     echo "User created successfully<br>";
 
     // get the user id of the user
     $user_id = ($conn->query("SELECT user_id FROM users WHERE email = '$email'")->fetch_assoc())["user_id"];
 
     // insert into students
-    $stu_result = $conn->execute_query("INSERT INTO STUDENTS VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)", [$user_id, $stu_gender, $stu_hisp_latino, $stu_uscitizen, $stu_firstgen, $stu_dob, $stu_discord, $stu_school, $stu_classification, $stu_grad_expect, $stu_major, $stu_major2, $stu_minor]);
+    $stu_result = $conn->execute_query(
+        "INSERT INTO STUDENTS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [$stu_uin, $user_id, $stu_gender, $stu_hisp_latino, $stu_uscitizen, $stu_firstgen, $stu_dob, $stu_discord, $stu_school, $stu_classification, $stu_grad_expect, $stu_major, $stu_major2, $stu_minor, $stu_minor2, $stu_gpa, $stu_in_rotc, $stu_in_corp, $stu_in_cyber_club, $stu_in_women_cyber]
+    );
 
     echo "${stu_result}";
 
@@ -57,28 +67,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION["is_admin"] = false;
     header("Location: student.php");
 
-
-
-    /* $sql = "SELECT * FROM users WHERE email = '$email' AND password = '$password'";
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        $row = $result->fetch_assoc();
-
-        // set the session vars
-        $_SESSION['user_id'] = $row['user_id'];
-        $_SESSION['email'] = $row['email'];
-        $_SESSION['is_admin'] = $row['is_admin'];
-
-        // redirect to correct page
-        if ($row['is_admin'] == 1) {
-            header("Location: admin.php");
-        } else {
-            header("Location: student.php");
-        }
-    } else {
-        echo "Invalid email or password.";
-    } */
 }
 
 $conn->close();
@@ -98,11 +86,13 @@ function checkboxToInt($val)
 // UI generators
 function createInput($key, $label)
 {
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"text\" name=\"${key}\"><br>";
 }
 
 function createCheckbox($key, $label)
 {
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"checkbox\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
 }
 
@@ -115,6 +105,7 @@ function createCheckbox($key, $label)
 
     <form method="post">
         <?php
+
         createInput("email", "Email");
         createInput("f_name", "First Name");
         createInput("l_name", "Last Name");
@@ -124,6 +115,8 @@ function createCheckbox($key, $label)
         // is_admin
         
         // student stuff
+        createInput("stu_uin", "UIN"); // new
+        
         createInput("stu_gender", "Gender");
         createCheckbox("stu_hisp_latino", "Hispanic?");
         createCheckbox("stu_uscitizen", "US Citizen?");
@@ -137,6 +130,17 @@ function createCheckbox($key, $label)
         createInput("stu_major", "Student major");
         createInput("stu_major2", "Student major 2");
         createInput("stu_minor", "Student minor");
+        createInput("stu_minor2", "Student minor 2"); // new
+        
+        createInput("stu_gpa", "Student GPA"); // new
+        createCheckbox("stu_in_rotc", "In ROTC?"); // new 
+        createCheckbox("stu_in_corp", "In Corps of Cadets?"); // new
+        createCheckbox("stu_in_cyber_club", "In Cybersecurity Club?"); // new
+        createCheckbox("stu_in_women_cyber", "In Women in Cybersecurity?"); // new
+        
+
+
+        // new fields
         ?>
 
 
