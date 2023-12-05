@@ -1,7 +1,7 @@
 <?php
 session_start();
 
-require 'utils/connect.php';
+require 'connect.php';
 
 $id = $_SESSION['user_id'];
 $f_name = $_POST['f_name'];
@@ -12,11 +12,12 @@ $email = $_POST['email'];
 
 $sql = "UPDATE users SET f_name = '$f_name', l_name = '$l_name', email = '$email' WHERE user_id = '$id'";
 
-if ($conn->query($sql) === TRUE) {
-    echo "Record updated successfully";
-} else {
-    echo "Error updating record: " . $conn->error;
-}
+header("Location: ../student.php");
+// if ($conn->query($sql) === TRUE) {
+//     echo "Record updated successfully";
+// } else {
+//     echo "Error updating record: " . $conn->error;
+// }
 
 $conn->close();
 ?>
