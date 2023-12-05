@@ -12,62 +12,152 @@ function getTableRowCount($conn, $tableName)
     return $row['count'];
 }
 
-// Function to fetch all rows from the events table
-function getAllEvents($conn)
+function getAllRecords($conn, $tableName)
 {
-    $sql = "SELECT * FROM events";
+    $sql = "SELECT * FROM $tableName";
     $result = $conn->query($sql);
     if (!$result) {
         die("Query failed: " . $conn->error);
     }
-    $events = array();
+    $records = array();
     while ($row = $result->fetch_assoc()) {
-        $events[] = $row;
+        $records[] = $row;
     }
-    return $events;
+    return $records;
 }
 
-// Function to update a row in the events table
-function updateEvent($conn, $eventId, $eventName, $eventLocation)
+function updateRecord($conn, $tableName, $recordId, $recordData)
 {
-    $sql = "UPDATE events SET event_name='$eventName', event_location='$eventLocation' WHERE event_id=$eventId";
+    $updateValues = '';
+    foreach ($recordData as $column => $value) {
+        if (strpos($column, '_id') !== false) {
+            $id_key = $column;
+            continue;
+        }
+        if ($value != '') {
+            $updateValues .= "$column = '$value', ";
+        }
+    }
+    $updateValues = rtrim($updateValues, ', ');
+
+    $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
     if ($conn->query($sql) !== TRUE) {
         echo "Error updating record: " . $conn->error;
     } else {
-        echo "Event updated";
+        echo "Entry in $tableName updated";
     }
 }
 
-// Function to add a new event to the events table
-function addEvent($conn, $eventName, $eventLocation)
+
+function addRecord($conn, $tableName, $recordData)
 {
-    $sql = "INSERT INTO events (event_name, event_location) VALUES ('$eventName', '$eventLocation')";
+    $columns = implode(', ', array_keys($recordData));
+    $values = "'" . implode("', '", array_values($recordData)) . "'";
+    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
+
     if ($conn->query($sql) !== TRUE) {
         echo "Error adding new record: " . $conn->error;
     } else {
-        echo "New event added";
+        echo "New entry to $tableName added";
     }
 }
 
-// Check if the form is submitted for updating or adding
+// check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['update_event'])) {
-        $selectedEventId = $_POST['selected_event_id'];
-        $eventName = $_POST['event_name'];
-        $eventLocation = $_POST['event_location'];
+    if (isset($_POST['update_record'])) {
+        $selectedRecordId = $_POST['selected_record_id'];
+        $recordData = array();
 
-        if ($selectedEventId == 'add_new') {
-            // Add new event
-            addEvent($conn, $eventName, $eventLocation);
+        // handle data based on selected table
+        switch ($_POST['selected_table']) {
+            case 'events':
+                $recordData['event_id'] = $_POST['selected_record_id'];
+                $recordData['event_name'] = $_POST['record_name'];
+                $recordData['event_location'] = $_POST['record_loc'];
+                break;
+
+            case 'trainings':
+                $recordData['train_id'] = $_POST['selected_record_id'];
+                $recordData['train_name'] = $_POST['record_name'];
+                break;
+            case 'certifications':
+                $recordData['cert_id'] = $_POST['selected_record_id'];
+                $recordData['cert_name'] = $_POST['record_name'];
+                break;
+            case 'programs':
+                $recordData['prog_id'] = $_POST['selected_record_id'];
+                $recordData['prog_name'] = $_POST['record_name'];
+                break;
+            case 'courses':
+                $recordData['cour_id'] = $_POST['selected_record_id'];
+                $recordData['cour_name'] = $_POST['record_name'];
+                break;
+
+            case 'summercamps':
+                $recordData['camp_id'] = $_POST['selected_record_id'];
+                $recordData['sc_name'] = $_POST['record_name'];
+                $recordData['sc_year'] = $_POST['record_year'];
+                break;
+            default:
+                // default case
+                echo "Invalid table selected";
+                break;
+        }
+
+        // if add_new its a new record
+        if ($selectedRecordId == 'add_new') {
+            addRecord($conn, $_POST['selected_table'], $recordData);
         } else {
-            // Update existing event
-            updateEvent($conn, $selectedEventId, $eventName, $eventLocation);
+            // update existing record
+            updateRecord($conn, $_POST['selected_table'], $selectedRecordId, $recordData);
+        }
+    } elseif (isset($_POST['delete_record'])) {
+        $selectedRecordId = $_POST['selected_record_id'];
+        $selectedTable = $_POST['selected_table'];
+        if ($selectedRecordId == 'add_new') {
+            // show an alert when trying to delete 'add new'
+            echo '<script>alert("Error: Cannot delete a new record.");</script>';
+        } else {
+            switch ($_POST['selected_table']) {
+                case 'events':
+                    $sql = "DELETE FROM $selectedTable WHERE event_id = $selectedRecordId";
+                    break;
+                case 'trainings':
+                    $sql = "DELETE FROM $selectedTable WHERE train_id = $selectedRecordId";
+                    break;
+                case 'certifications':
+                    $sql = "DELETE FROM $selectedTable WHERE cert_id = $selectedRecordId";
+                    break;
+                case 'programs':
+                    $sql = "DELETE FROM $selectedTable WHERE prog_id = $selectedRecordId";
+                    break;
+                case 'courses':
+                    $sql = "DELETE FROM $selectedTable WHERE cour_id = $selectedRecordId";
+                    break;
+                case 'summercamps':
+                    $sql = "DELETE FROM $selectedTable WHERE camp_id = $selectedRecordId";
+                    break;
+                default:
+                    // default case
+                    echo "Invalid table selected";
+                    break;
+            }
+            if ($conn->query($sql) !== TRUE) {
+                echo "Error deleting record: " . $conn->error;
+            } else {
+                echo "$selectedTable record deleted";
+            }
         }
     }
 }
 
-// Fetch all events from the events table
-$events = getAllEvents($conn);
+// get all records from each table
+$events = getAllRecords($conn, 'events');
+$trainings = getAllRecords($conn, 'trainings');
+$certifications = getAllRecords($conn, 'certifications');
+$programs = getAllRecords($conn, 'programs');
+$summercamps = getAllRecords($conn, 'summercamps');
+$courses = getAllRecords($conn, 'courses');
 
 ?>
 
@@ -107,8 +197,9 @@ $events = getAllEvents($conn);
             ?>
         </ul>
     </section>
+    <hr />
     <section>
-        <h3> Events</h3>
+        <h3>Events</h3>
         <table border="1">
             <tr>
                 <th>Event Id</th>
@@ -129,14 +220,15 @@ $events = getAllEvents($conn);
         </table>
 
         <br>
-        <h4>Update/Add Event</h4>
+        <h4>Modify Event</h4>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="events">
+
             <label>Select Event:</label>
-            <select name="selected_event_id">
+            <select name="selected_record_id">
                 <option value="add_new">Add new Event</option>
                 <?php
-                // Loop through events and display each event_id in the dropdown
                 foreach ($events as $event) {
                     echo "<option value='{$event['event_id']}'>{$event['event_id']}</option>";
                 }
@@ -145,16 +237,245 @@ $events = getAllEvents($conn);
             <br>
 
             <label>Event Name:</label>
-            <input type="text" name="event_name" required><br>
-
+            <input type="text" name="record_name"><br>
             <label>Event Location:</label>
-            <input type="text" name="event_location" required><br>
+            <input type="text" name="record_loc"><br>
 
             <br>
-            <button type="submit" name="update_event">Update/Add Event</button>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
         </form>
     </section>
+    <hr />
+    <section>
+        <h3>Trainings</h3>
+        <table border="1">
+            <tr>
+                <th>Training Id</th>
+                <th>Training Name</th>
+            </tr>
 
+            <?php
+            foreach ($trainings as $training) {
+                echo "<tr>";
+                echo "<td><span>{$training['train_id']}</span></td>";
+                echo "<td><span>{$training['train_name']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Training</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="trainings">
+
+            <label>Select Training:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Training</option>
+                <?php
+                foreach ($trainings as $training) {
+                    echo "<option value='{$training['train_id']}'>{$training['train_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Training Name:</label>
+            <input type="text" name="record_name"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <section>
+        <h3>Certifications</h3>
+        <table border="1">
+            <tr>
+                <th>Certification Id</th>
+                <th>Certification Name</th>
+            </tr>
+
+            <?php
+            foreach ($certifications as $certification) {
+                echo "<tr>";
+                echo "<td><span>{$certification['cert_id']}</span></td>";
+                echo "<td><span>{$certification['cert_name']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Training</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="certifications">
+
+            <label>Select Certification:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Certification</option>
+                <?php
+                foreach ($certifications as $certification) {
+                    echo "<option value='{$certification['cert_id']}'>{$certification['cert_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Certification Name:</label>
+            <input type="text" name="record_name"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <!-- Repeat similar sections for programs, summercamps, and courses -->
+    <section>
+        <h3>Programs</h3>
+        <table border="1">
+            <tr>
+                <th>Program Id</th>
+                <th>Program Name</th>
+            </tr>
+
+            <?php
+            foreach ($programs as $program) {
+                echo "<tr>";
+                echo "<td><span>{$program['prog_id']}</span></td>";
+                echo "<td><span>{$program['prog_name']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Training</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="programs">
+
+            <label>Select Program:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Program</option>
+                <?php
+                foreach ($programs as $program) {
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Program Name:</label>
+            <input type="text" name="record_name"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <section>
+        <h3>Summer Camps</h3>
+        <table border="1">
+            <tr>
+                <th>Summer Camp Id</th>
+                <th>Summer Camp Name</th>
+                <th>Summer Camp Year</th>
+            </tr>
+
+            <?php
+            foreach ($summercamps as $summercamp) {
+                echo "<tr>";
+                echo "<td><span>{$summercamp['camp_id']}</span></td>";
+                echo "<td><span>{$summercamp['sc_name']}</span></td>";
+                echo "<td><span>{$summercamp['sc_year']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Summer Camp</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="summercamps">
+
+            <label>Select Summer Camp:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Summer Camp</option>
+                <?php
+                foreach ($summercamps as $summercamp) {
+                    echo "<option value='{$summercamp['camp_id']}'>{$summercamp['camp_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Summer Camp Name:</label>
+            <input type="text" name="record_name"><br>
+            <label>Summer Camp Year:</label>
+            <input type="text" name="record_year"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <section>
+        <h3>Courses</h3>
+        <table border="1">
+            <tr>
+                <th>Course Id</th>
+                <th>Course Name</th>
+            </tr>
+
+            <?php
+            foreach ($courses as $course) {
+                echo "<tr>";
+                echo "<td><span>{$course['cour_id']}</span></td>";
+                echo "<td><span>{$course['cour_name']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Course</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="courses">
+
+            <label>Select Course:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Course</option>
+                <?php
+                foreach ($courses as $course) {
+                    echo "<option value='{$course['cour_id']}'>{$course['cour_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Course Name:</label>
+            <input type="text" name="record_name"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
     <?php
     // Close connection
     $conn->close();
