@@ -28,38 +28,42 @@ function getAllEvents($conn)
 }
 
 // Function to update a row in the events table
-function updateEvent($conn, $eventData)
+function updateEvent($conn, $eventId, $eventName, $eventLocation)
 {
-    foreach ($eventData as $eventId => $values) {
-        $eventName = $values['event_name'];
-        $eventLocation = $values['event_location'];
-
-        $sql = "UPDATE events SET event_name='$eventName', event_location='$eventLocation' WHERE event_id=$eventId";
-        if ($conn->query($sql) !== TRUE) {
-            echo "Error updating record: " . $conn->error;
-        }
+    $sql = "UPDATE events SET event_name='$eventName', event_location='$eventLocation' WHERE event_id=$eventId";
+    if ($conn->query($sql) !== TRUE) {
+        echo "Error updating record: " . $conn->error;
+    } else {
+        echo "Event updated";
     }
-
-    echo "Records updated successfully";
 }
 
-// Check if the form is submitted for updating
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['update_event'])) {
-    // Get the array of event data
-    $eventData = array();
+// Function to add a new event to the events table
+function addEvent($conn, $eventName, $eventLocation)
+{
+    $sql = "INSERT INTO events (event_name, event_location) VALUES ('$eventName', '$eventLocation')";
+    if ($conn->query($sql) !== TRUE) {
+        echo "Error adding new record: " . $conn->error;
+    } else {
+        echo "New event added";
+    }
+}
 
-    if (isset($_POST['event_name']) && isset($_POST['event_location'])) {
-        foreach ($_POST['event_name'] as $eventId => $eventName) {
-            $eventLocation = $_POST['event_location'][$eventId];
-            $eventData[$eventId] = array(
-                'event_name' => $eventName,
-                'event_location' => $eventLocation
-            );
+// Check if the form is submitted for updating or adding
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['update_event'])) {
+        $selectedEventId = $_POST['selected_event_id'];
+        $eventName = $_POST['event_name'];
+        $eventLocation = $_POST['event_location'];
+
+        if ($selectedEventId == 'add_new') {
+            // Add new event
+            addEvent($conn, $eventName, $eventLocation);
+        } else {
+            // Update existing event
+            updateEvent($conn, $selectedEventId, $eventName, $eventLocation);
         }
     }
-
-    // Update the events
-    updateEvent($conn, $eventData);
 }
 
 // Fetch all events from the events table
@@ -77,8 +81,7 @@ $events = getAllEvents($conn);
 </head>
 
 <body>
-    <h2>Admin Page - Stats</h2>
-
+    <h2>Admin Page</h2>
     <section>
         <h3>Stats</h3>
 
@@ -105,44 +108,50 @@ $events = getAllEvents($conn);
         </ul>
     </section>
     <section>
-        <h3>Add New Event</h3>
+        <h3> Events</h3>
+        <table border="1">
+            <tr>
+                <th>Event Id</th>
+                <th>Event Name</th>
+                <th>Event Location</th>
+            </tr>
+
+            <?php
+            foreach ($events as $event) {
+                echo "<tr>";
+                echo "<td><span>{$event['event_id']}</span></td>";
+                echo "<td><span>{$event['event_name']}</span></td>";
+                echo "<td><span>{$event['event_location']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Update/Add Event</h4>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <label>Event Name:</label>
-            <input type="text" name="new_event_name" required><br>
-
-            <label>Event Location:</label>
-            <input type="text" name="new_event_location" required><br>
-
-            <br>
-            <button type="submit" name="add_event">Add Event</button>
-        </form>
-    </section>
-    <section>
-        <h3>Update Events</h3>
-
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <table border="1">
-                <tr>
-                    <th>Event Name</th>
-                    <th>Event Location</th>
-                </tr>
-
+            <label>Select Event:</label>
+            <select name="selected_event_id">
+                <option value="add_new">Add new Event</option>
                 <?php
-                // Loop through events and display each row with input boxes
+                // Loop through events and display each event_id in the dropdown
                 foreach ($events as $event) {
-                    echo "<tr>";
-                    echo "<td><input type='text' name='event_name[{$event['event_id']}]' value='{$event['event_name']}'></td>";
-                    echo "<td><input type='text' name='event_location[{$event['event_id']}]' value='{$event['event_location']}'></td>";
-                    echo "<input type='hidden' name='event_id[{$event['event_id']}]' value='{$event['event_id']}'>"; // Hidden input for event_id
-                    echo "</tr>";
+                    echo "<option value='{$event['event_id']}'>{$event['event_id']}</option>";
                 }
                 ?>
+            </select>
+            <br>
 
-            </table>
+            <label>Event Name:</label>
+            <input type="text" name="event_name" required><br>
+
+            <label>Event Location:</label>
+            <input type="text" name="event_location" required><br>
 
             <br>
-            <button type="submit" name="update_event">Update Events</button>
+            <button type="submit" name="update_event">Update/Add Event</button>
         </form>
     </section>
 
