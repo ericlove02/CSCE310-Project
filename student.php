@@ -9,6 +9,8 @@ if (!isset($_SESSION['user_id'])) {
 
 require 'utils/connect.php';
 
+
+
 $id = $_SESSION['user_id'];
 
 $sql = "SELECT * FROM users WHERE user_id = '$id'";
@@ -78,7 +80,9 @@ function createCheckbox($row, $key, $label)
         ?>
         
         <!-- Add more fields as needed -->
-        <input type="submit" value="Update">
+        <input type="submit" name="submit" value="Update">
+        
+        <input type="submit" name="submit" onclick="return confirm('Are you sure you want to deactivate your account?')" value="Deactivate account">
     </form>
 
 <!-- File modification -->

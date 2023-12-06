@@ -4,8 +4,23 @@ session_start();
 require 'connect.php';
 
 
+
 $id = $_SESSION['user_id']; 
 // TODO: Add validation and sanitization
+
+if(@$_POST['submit'] == 'Deactivate account') {
+    $sql = "DELETE FROM users WHERE user_id = $id";
+    $sql2 = "DELETE FROM students WHERE user_id = $id";
+    if($conn->execute_query($sql) && $conn->execute_query($sql2)) {
+        echo "Account deactivated successfully";
+    } else {
+        echo "Failed to deactivate account";
+    }
+    session_abort();
+    header("Location: /index.php");
+
+    return;
+}
 
 $userkeys = array('user_id' => true, 'email' => true, 'f_name' => true, 'l_name' => true, 'm_initial'=> true, 'phone' => true, 'password' => true, 'is_admin' => true);
 
