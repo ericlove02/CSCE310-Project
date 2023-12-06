@@ -92,11 +92,30 @@ function createInput($key, $label)
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"text\" name=\"${key}\" required><br>";
 }
+function createDefaultInput($key, $label, $default)
+{
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
+    echo "${label}: <input type=\"text\" name=\"${key}\" value=\"${default}\" required><br>";
+}
 
 function createCheckbox($key, $label)
 {
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"checkbox\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
+}
+
+function createDate($key, $label)
+{
+    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
+    echo "${label}: <input type=\"date\" name=\"${key}\" required><br>";
+}
+
+function createSelection($key, $label, $assoc_name_value) {
+    echo "${label}: <select name=\"$key\">";
+    foreach($assoc_name_value as $name => $value) {
+        echo "<option value=\"${value}\">${name}</option>";
+    }
+    echo "</select><br>";
 }
 
 ?>
@@ -127,15 +146,15 @@ function createCheckbox($key, $label)
         createCheckbox("stu_uscitizen", "US Citizen?");
         createCheckbox("stu_firstgen", "First generation college student?");
 
-        createInput("stu_dob", "Date of Birth");
-        createInput("stu_discord", "Discord username");
-        createInput("stu_school", "School");
-        createInput("stu_classification", "Student classification");
-        createInput("stu_grad_expect", "Expected graduation date");
+        createDate("stu_dob", "Date of Birth");
+        createInput("stu_discord", "Discord username"); 
+        createDefaultInput("stu_school", "School", "Texas A&M University");
+        createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
+        createDate("stu_grad_expect", "Expected graduation date");
         createInput("stu_major", "Student major");
-        createInput("stu_major2", "Student major 2");
-        createInput("stu_minor", "Student minor");
-        createInput("stu_minor2", "Student minor 2"); // new
+        createDefaultInput("stu_major2", "Student major 2", "N/A");
+        createDefaultInput("stu_minor", "Student minor", "N/A");
+        createDefaultInput("stu_minor2", "Student minor 2", "N/A"); // new
         
         createInput("stu_gpa", "Student GPA"); // new
         createCheckbox("stu_in_rotc", "In ROTC?"); // new 

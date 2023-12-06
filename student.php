@@ -100,7 +100,7 @@ function fixJoinTableVariables($columnName)
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['update_record'])) {
-        $selectedRecordId = $_POST['selected_record_id'];
+        $selectedRecordId = $_POST['selected_record_id'] != null ? $_POST['selected_record_id'] : "add_new";
         $recordData = array();
 
         // handle data based on selected table
@@ -117,6 +117,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $recordData['new_intshp'] = $_POST['new_intshp'];
                 $recordData['user_id'] = $id;
                 $recordData['stin_app_status'] = $_POST['app_status'];
+                break;
+            case 'internships':
+                $recordData['intshp_name'] = $_POST['intshp_name'];
+                $recordData['intshp_year'] = $_POST['intshp_year'];
+                $recordData['intshp_state'] = $_POST['intshp_state'];
+                $recordData['intshp_country'] = $_POST['intshp_country'];
+                $recordData['intshp_is_federal'] = $_POST['intshp_is_federal'];
                 break;
             default:
                 // default case
@@ -192,7 +199,11 @@ $internships = getAllRecords($conn, 'internships');
             $val = $row[$key] == 1 ? 'checked' : '';
             echo "${label}:   <input type='hidden' value='0' name='${key}'>    <input type=\"checkbox\" name=\"${key}\" value='1' {$val}><br>";
         }
-
+        ?>
+        <span>UIN:
+            <?php echo $id ?>
+        </span><br>
+        <?php
         createInput($row, "email", "Email");
         createInput($row, "f_name", "First Name");
         createInput($row, "l_name", "Last Name");
@@ -201,8 +212,12 @@ $internships = getAllRecords($conn, 'internships');
         createInput($row, "password", "Password");
         // is_admin
         
+        // Don't try to show show student info if they are not a student
+        if ($stu_row != true)
+            die("<br><b>Not a student<b><br>");
+
         // student stuff
-        createInput($stu_row, "stu_uin", "UIN"); // new
+        // createInput($stu_row, "stu_uin", "UIN"); // new
         
         createInput($stu_row, "stu_gender", "Gender");
         createCheckbox($stu_row, "stu_hisp_latino", "Hispanic?");
@@ -226,7 +241,6 @@ $internships = getAllRecords($conn, 'internships');
         createCheckbox($stu_row, "stu_in_women_cyber", "In Women in Cybersecurity?"); // new
         ?>
 
-        <!-- Add more fields as needed -->
         <input type="submit" name="submit" value="Update">
 
         <input type="submit" name="submit" onclick="return confirm('Are you sure you want to deactivate your account?')"
@@ -234,7 +248,7 @@ $internships = getAllRecords($conn, 'internships');
     </form>
 
     <!-- File modification -->
-
+    <br>
     <section>
         <table border="1">
             <tr>
@@ -374,12 +388,36 @@ $internships = getAllRecords($conn, 'internships');
                 echo "<td><span>{$internship['intshp_year']}</span></td>";
                 echo "<td><span>{$internship['intshp_state']}</span></td>";
                 echo "<td><span>{$internship['intshp_country']}</span></td>";
-                echo "<td><span>{$internship['intshp_is_federal']}</span></td>";
+                echo "<td><span>" . ($internship['intshp_is_federal'] ? 'Yes' : 'No') . "</span></td>";
                 echo "</tr>";
             }
             ?>
 
         </table>
+        <br>
+        <h4>Add an Internship</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="internships">
+            <input type="hidden" name="selected_record_id" value="add_new">
+            <label>Internship Name:</label>
+            <input type="text" name="intshp_name"><br>
+            <label>Internship Year:</label>
+            <input type="text" name="intshp_year"><br>
+            <label>Internship State:</label>
+            <input type="text" name="intshp_state"><br>
+            <label>Internship Country:</label>
+            <input type="text" name="intshp_country"><br>
+            <label>Internship Is Federal?:</label>
+            <select name="intshp_is_federal" id="intshp_is_federal">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <br>
+            <button type="submit" name="update_record">Add</button>
+        </form>
         <h4>Your Internships</h4>
         <table border="1">
             <tr>
@@ -425,21 +463,15 @@ $internships = getAllRecords($conn, 'internships');
         </form>
     </section>
 
-    <!-- Repeat the above for internships, events, trainings, and certifications -->
-
     <?php
     if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (isset($_POST['insert'])) {
-            // Add your insert logic here
-            // $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES (?, ?, ?, ?)";
             $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES ('" . $_POST['app_date_applied'] . "', '" . $_POST['app_purpose'] . "', '" . $_POST['app_resume'] . "', '" . $_POST['app_type'] . "')";
         } elseif (isset($_POST['update'])) {
             $app_id = $_POST['app_id'];
-            // Add your update logic here
             // $sql = "UPDATE applications SET ... WHERE app_id = $app_id";
         } elseif (isset($_POST['delete'])) {
             $app_id = $_POST['app_id'];
-            // Add your delete logic here
             // $sql = "DELETE FROM applications WHERE app_id = $app_id";
         }
     }
@@ -468,7 +500,6 @@ $internships = getAllRecords($conn, 'internships');
     echo "</table>";
     ?>
 
-    <!-- Insert Application Form -->
     <form method="post">
         <label for="app_date_applied">Date Applied:</label><br>
         <input type="date" id="app_date_applied" name="app_date_applied"><br>
