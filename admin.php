@@ -146,12 +146,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // handle data based on selected table
         switch ($_POST['selected_table']) {
+            case 'users':
+                $recordData['user_id'] = $_POST['selected_record_id'];
+                $recordData['f_name'] = $_POST['first_name'];
+                $recordData['l_name'] = $_POST['last_name'];
+                $recordData['m_initial'] = $_POST['m_initial'];
+                $recordData['phone'] = $_POST['phone'];
+                $recordData['password'] = $_POST['password'];
+                $recordData['is_admin'] = $_POST['is_admin'];
+                break;
             case 'events':
                 $recordData['event_id'] = $_POST['selected_record_id'];
                 $recordData['event_name'] = $_POST['record_name'];
                 $recordData['event_location'] = $_POST['record_loc'];
                 break;
-
             case 'trainings':
                 $recordData['train_id'] = $_POST['selected_record_id'];
                 $recordData['train_name'] = $_POST['record_name'];
@@ -195,6 +203,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<script>alert("Error: Cannot delete a new record.");</script>';
         } else {
             switch ($_POST['selected_table']) {
+                case 'users':
+                    $sql = "DELETE FROM $selectedTable WHERE user_id = $selectedRecordId";
+                    break;
                 case 'events':
                     $sql = "DELETE FROM $selectedTable WHERE event_id = $selectedRecordId";
                     break;
@@ -234,7 +245,7 @@ $certifications = getAllRecords($conn, 'certifications');
 $programs = getAllRecords($conn, 'programs');
 $summercamps = getAllRecords($conn, 'summercamps');
 $courses = getAllRecords($conn, 'courses');
-
+$users = getAllRecords($conn, 'users');
 ?>
 
 <!DOCTYPE html>
@@ -280,7 +291,7 @@ $courses = getAllRecords($conn, 'courses');
                     "studentcerts" => "student certifications",
                     "programenrollments" => "program enrollments"
                 )[$table] ?? $table;
-                
+
                 echo "<li>Total number of $tableName: $rowCount</li>";
             }
             ?>
@@ -347,6 +358,77 @@ $courses = getAllRecords($conn, 'courses');
         }
         ?>
 
+    </section>
+    <hr />
+    <section>
+        <h3>Users</h3>
+        <table border="1">
+            <tr>
+                <th>User Id</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Middle Initial</th>
+                <th>Phone</th>
+                <th>Password</th>
+                <th>Is Admin</th>
+            </tr>
+
+            <?php
+            foreach ($users as $user) {
+                echo "<tr>";
+                echo "<td><span>{$user['user_id']}</span></td>";
+                echo "<td><span>{$user['email']}</span></td>";
+                echo "<td><span>{$user['f_name']}</span></td>";
+                echo "<td><span>{$user['l_name']}</span></td>";
+                echo "<td><span>{$user['m_initial']}</span></td>";
+                echo "<td><span>{$user['phone']}</span></td>";
+                echo "<td><span>{$user['password']}</span></td>";
+                echo "<td><span>" . ($user['is_admin'] ? 'Yes' : 'No') . "</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify User</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="users">
+
+            <label>Select User:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new User</option>
+                <?php
+                foreach ($users as $user) {
+                    echo "<option value='{$user['user_id']}'>{$user['user_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>First Name:</label>
+            <input type="text" name="first_name"><br>
+            <label>First Name:</label>
+            <input type="text" name="last_name"><br>
+            <label>Middle Initial:</label>
+            <input type="text" name="m_initial"><br>
+            <label>Phone Number:</label>
+            <input type="text" name="phone"><br>
+            <label>Password:</label>
+            <input type="text" name="password"><br>
+            <label for="is_admin">Is Admin?</label>
+            <select name="is_admin" id="is_admin">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
     </section>
     <hr />
     <section>
