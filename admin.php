@@ -375,6 +375,13 @@ $users = getAllRecords($conn, 'users');
             </tr>
 
             <?php
+            if (@$_POST['doChangeUser']) {
+                session_start();
+                $_SESSION['user_id'] = $_POST['user_id'];
+                header("Location: student.php");
+                return;
+            }
+            
             foreach ($users as $user) {
                 echo "<tr>";
                 echo "<td><span>{$user['user_id']}</span></td>";
@@ -385,6 +392,7 @@ $users = getAllRecords($conn, 'users');
                 echo "<td><span>{$user['phone']}</span></td>";
                 echo "<td><span>{$user['password']}</span></td>";
                 echo "<td><span>" . ($user['is_admin'] ? 'Yes' : 'No') . "</span></td>";
+                echo "<td><form method='post' action='", htmlspecialchars($_SERVER["PHP_SELF"]) , "'> <input type='hidden' name='doChangeUser' value='1'> <input type='hidden' name='user_id' value='", $user['user_id'], "'> <button type='submit' name='submit'>Switch</button> </form></td>";
                 echo "</tr>";
             }
             ?>
