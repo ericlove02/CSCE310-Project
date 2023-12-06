@@ -134,7 +134,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// get all record from the table
+// get all record from the table for the user
 $takencourses = getAllRecords($conn, 'takencourses', $id, 'courses', 'cour_id');
 $courses = getAllRecords($conn, 'courses');
 $applications = getAllRecords($conn, 'applications', $id);
@@ -334,6 +334,59 @@ $internships = getAllRecords($conn, 'studentinternships', $id);
     $result = $conn->query($sql);
     ?>
 
+    
+    <section>
+        <h3>Internships</h3>
+        <h4>All Internships</h4>
+        <table border="1">
+            <tr>
+                <th>Internship Id</th>
+                <th>Internship Name</th>
+                <th>Internship Status</th>
+                <!-- Add other columns as needed -->
+            </tr>
+
+            <?php
+            // Replace with your actual function to fetch internships
+            // $internships = getAllInternships($id); 
+
+            foreach ($internships as $internship) {
+                echo "<tr>";
+                echo "<td><span>{$internship['internship_id']}</span></td>";
+                echo "<td><span>{$internship['user_id']}</span></td>";
+                echo "<td><span>{$internship['stin_app_status']}</span></td>";
+                // Add other columns as needed
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+        <br>
+    <h4>Modify Your Internship</h4>
+
+    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+        <input type="hidden" name="selected_table" value="studentinternships">
+
+        <label>Select Internship:</label>
+        <select name="selected_record_id">
+            <option value="add_new">Add new Internship</option>
+            <?php
+            foreach ($internships as $internship) {
+                echo "<option value='{$internship['internship_id']}'>{$internship['internship_id']}</option>";
+            }
+            ?>
+        </select>
+        <br>
+        <label>Internship Id:</label>
+        <input type="text" name="internship_id"><br>
+        <label>Internship Name:</label>
+        <input type="text" name="internship_name"><br>
+        <label>Internship Status:</label>
+        <input type="text" name="stin_app_status"><br>
+        <!-- Add other fields as needed -->
+        <input type="submit" name="submit" value="Submit">
+    </form>
+    </section>
 
     <table>
         <tr>
