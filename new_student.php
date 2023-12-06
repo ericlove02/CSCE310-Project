@@ -35,8 +35,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stu_in_corp = checkBoxToInt(@$_POST["stu_in_corp"]); // Student in corps
     $stu_in_cyber_club = checkBoxToInt(@$_POST["stu_in_cyber_club"]); // Student in cs club
     $stu_in_women_cyber = checkBoxToInt(@$_POST["stu_in_women_cyber"]); // Student in women in cybersec
-    // Make sure there are no other users with the same email
-
+    
+    // Make sure there are no other users with the same email / uin
     $has_existing_user = $conn->query("SELECT * FROM users WHERE email = '$email'");
     if ($has_existing_user->num_rows > 0) {
         echo "User already exists with email ${email}<br>";
@@ -44,17 +44,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         return;
     }
 
-    // create the user
-    $conn->execute_query("INSERT INTO Users(email, password, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,?,FALSE)", [$email, $password, $f_name, $l_name, $m_initial, $phone]);
-    echo "User created successfully<br>";
+    $has_existing_uin = $conn->query("SELECT * FROM users WHERE user_id = $stu_uin");
+    if ($has_existing_user->num_rows > 0) {
+        echo "User already exists with uin ${stu_uin}<br>";
+        http_response_code(500);
+        return;
+    }
 
-    // get the user id of the user
-    $user_id = ($conn->query("SELECT user_id FROM users WHERE email = '$email'")->fetch_assoc())["user_id"];
+    // create the user
+    $conn->execute_query("INSERT INTO Users(user_id, email, password, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,?,?,FALSE)", [$stu_uin, $email, $password, $f_name, $l_name, $m_initial, $phone]);
+    echo "User created successfully<br>";
 
     // insert into students
     $stu_result = $conn->execute_query(
-        "INSERT INTO STUDENTS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-        [$stu_uin, $user_id, $stu_gender, $stu_hisp_latino, $stu_uscitizen, $stu_firstgen, $stu_dob, $stu_discord, $stu_school, $stu_classification, $stu_grad_expect, $stu_major, $stu_major2, $stu_minor, $stu_minor2, $stu_gpa, $stu_in_rotc, $stu_in_corp, $stu_in_cyber_club, $stu_in_women_cyber]
+        "INSERT INTO STUDENTS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        [$stu_uin, $stu_gender, $stu_hisp_latino, $stu_uscitizen, $stu_firstgen, $stu_dob, $stu_discord, $stu_school, $stu_classification, $stu_grad_expect, $stu_major, $stu_major2, $stu_minor, $stu_minor2, $stu_gpa, $stu_in_rotc, $stu_in_corp, $stu_in_cyber_club, $stu_in_women_cyber]
     );
 
     echo "${stu_result}";
@@ -62,11 +66,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     echo "Student created successfully<br>";
 
     // Redirect to student page
-    $_SESSION["user_id"] = $user_id;
+    $_SESSION["user_id"] = $stu_uin;
     $_SESSION["password"] = $password;
     $_SESSION["is_admin"] = false;
     header("Location: student.php");
-
 }
 
 $conn->close();
@@ -117,7 +120,7 @@ function createCheckbox($key, $label)
         // is_admin
         
         // student stuff
-        createInput("stu_uin", "UIN"); // new
+        createInput("stu_uin", "UIN"); 
         
         createInput("stu_gender", "Gender");
         createCheckbox("stu_hisp_latino", "Hispanic?");

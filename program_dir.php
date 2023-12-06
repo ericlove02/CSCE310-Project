@@ -55,7 +55,7 @@ $available_programs = $result->fetch_all();
 <html>
 
 <head>
-    <title>Student Applications</title>
+    <title>Student Programs</title>
 </head>
 <style>
     table {
