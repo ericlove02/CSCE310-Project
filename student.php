@@ -2,7 +2,7 @@
 session_start();
 
 // Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
+if(!isset($_SESSION['user_id'])) {
     echo "You must log in first";
     exit;
 }
@@ -19,37 +19,35 @@ $row = $result->fetch_assoc();
 
 $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_assoc();
 
-function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_on = null)
-{
-    if ($join_table && $join_on) {
+function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_on = null) {
+    if($join_table && $join_on) {
         $sql = "SELECT * FROM $tableName
                 JOIN $join_table ON $tableName.$join_on = $join_table.$join_on
                 WHERE $tableName.user_id = '$id'";
-    } elseif ($id) {
+    } elseif($id) {
         $sql = "SELECT * FROM $tableName WHERE user_id = '$id'";
     } else {
         $sql = "SELECT * FROM $tableName";
     }
     // echo $sql;
     $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
+    if(!$result) {
+        die("Query failed: ".$conn->error);
     }
     $records = array();
-    while ($row = $result->fetch_assoc()) {
+    while($row = $result->fetch_assoc()) {
         $records[] = $row;
     }
     return $records;
 }
 
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
+function updateRecord($conn, $tableName, $recordId, $recordData) {
     $updateValues = '';
     $keyValues = '';
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
+    foreach($recordData as $column => $value) {
+        if(strpos($column, '_id') !== false) {
             $keyValues .= "$column = '$value' AND ";
-        } elseif ($value != '') {
+        } elseif($value != '') {
             $column = fixJoinTableVariables($column);
             $updateValues .= "$column = '$value', ";
         }
@@ -59,17 +57,16 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
 
     $sql = "UPDATE $tableName SET $updateValues WHERE $keyValues";
     // echo $sql;
-    if ($conn->query($sql) !== TRUE) {
-        echo "Error updating record: " . $conn->error;
+    if($conn->query($sql) !== TRUE) {
+        echo "Error updating record: ".$conn->error;
     } else {
         echo "Entry in $tableName updated";
     }
 }
 
-function addRecord($conn, $tableName, $recordData)
-{
+function addRecord($conn, $tableName, $recordData) {
     $fixedRecordData = array();
-    foreach ($recordData as $columnName => $value) {
+    foreach($recordData as $columnName => $value) {
         $fixedColumnName = fixJoinTableVariables($columnName);
         $fixedRecordData[$fixedColumnName] = $value;
     }
@@ -78,35 +75,34 @@ function addRecord($conn, $tableName, $recordData)
         return $value !== "add_new";
     });
 
-    $values = "'" . implode("', '", $filteredValues) . "'";
+    $values = "'".implode("', '", $filteredValues)."'";
     $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
     // echo $sql;
-    if ($conn->query($sql) !== TRUE) {
-        echo "Error adding new record: " . $conn->error;
+    if($conn->query($sql) !== TRUE) {
+        echo "Error adding new record: ".$conn->error;
     } else {
         echo "New entry to $tableName added";
     }
 }
 
-function fixJoinTableVariables($columnName)
-{
+function fixJoinTableVariables($columnName) {
     // jank fix for joined tables
-    if ($columnName == "new_cour") {
+    if($columnName == "new_cour") {
         return "cour_id";
-    } elseif ($columnName == "new_intshp") {
+    } elseif($columnName == "new_intshp") {
         return "intshp_id";
     } else {
         return $columnName;
     }
 }
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['update_record'])) {
-        $selectedRecordId = $_POST['selected_record_id'];
+if($_SERVER["REQUEST_METHOD"] == "POST") {
+    if(isset($_POST['update_record'])) {
+        $selectedRecordId = $_POST['selected_record_id'] != null ? $_POST['selected_record_id'] : "add_new";
         $recordData = array();
 
         // handle data based on selected table
-        switch ($_POST['selected_table']) {
+        switch($_POST['selected_table']) {
             case 'takencourses':
                 $recordData['cour_id'] = $_POST['selected_record_id'];
                 $recordData['new_cour'] = $_POST['new_cour'];
@@ -120,6 +116,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $recordData['user_id'] = $id;
                 $recordData['stin_app_status'] = $_POST['app_status'];
                 break;
+            case 'internships':
+                $recordData['intshp_name'] = $_POST['intshp_name'];
+                $recordData['intshp_year'] = $_POST['intshp_year'];
+                $recordData['intshp_state'] = $_POST['intshp_state'];
+                $recordData['intshp_country'] = $_POST['intshp_country'];
+                $recordData['intshp_is_federal'] = $_POST['intshp_is_federal'];
+                break;
             default:
                 // default case
                 echo "Invalid table selected";
@@ -127,20 +130,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
 
         // if add_new its a new record
-        if ($selectedRecordId == 'add_new') {
+        if($selectedRecordId == 'add_new') {
             addRecord($conn, $_POST['selected_table'], $recordData);
         } else {
             // update existing record
             updateRecord($conn, $_POST['selected_table'], $selectedRecordId, $recordData);
         }
-    } elseif (isset($_POST['delete_record'])) {
+    } elseif(isset($_POST['delete_record'])) {
         $selectedRecordId = $_POST['selected_record_id'];
         $selectedTable = $_POST['selected_table'];
-        if ($selectedRecordId == 'add_new') {
+        if($selectedRecordId == 'add_new') {
             // show an alert when trying to delete 'add new'
             echo '<script>alert("Error: Cannot delete a new record.");</script>';
         } else {
-            switch ($_POST['selected_table']) {
+            switch($_POST['selected_table']) {
                 case 'takencourses':
                     $sql = "DELETE FROM $selectedTable WHERE cour_id = $selectedRecordId AND user_id = $id";
                     break;
@@ -152,8 +155,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     echo "Invalid table selected";
                     break;
             }
-            if ($conn->query($sql) !== TRUE) {
-                echo "Error deleting record: " . $conn->error;
+            if($conn->query($sql) !== TRUE) {
+                echo "Error deleting record: ".$conn->error;
             } else {
                 echo "$selectedTable record deleted";
             }
@@ -183,14 +186,12 @@ $internships = getAllRecords($conn, 'internships');
         <?php
 
 
-        function createInput($row, $key, $label)
-        {
+        function createInput($row, $key, $label) {
             $val = $row[$key];
             echo "${label}: <input type=\"text\" name=\"${key}\" value=\"${val}\"><br>";
         }
 
-        function createCheckbox($row, $key, $label)
-        {
+        function createCheckbox($row, $key, $label) {
             $val = $row[$key] == 1 ? 'checked' : '';
             echo "${label}:   <input type='hidden' value='0' name='${key}'>    <input type=\"checkbox\" name=\"${key}\" value='1' {$val}><br>";
         }
@@ -245,17 +246,17 @@ $internships = getAllRecords($conn, 'internships');
 
             <?php
             $result = $conn->execute_query("SELECT file_id, user_id, filename, mimetype FROM user_documents WHERE user_id = ?", [$id]);
-            if (!$result) {
-                die("Query failed: " . $conn->error);
+            if(!$result) {
+                die("Query failed: ".$conn->error);
             }
 
             $files = [];
 
-            while ($file = $result->fetch_assoc()) {
+            while($file = $result->fetch_assoc()) {
                 $files[] = $file;
             }
 
-            foreach ($files as $file) {
+            foreach($files as $file) {
                 echo "<tr>";
                 echo "<td><a target='_blank' href='utils/document.php?serve={$file['file_id']}'>{$file['filename']}</span></td>";
                 echo "</tr>";
@@ -269,7 +270,7 @@ $internships = getAllRecords($conn, 'internships');
             <select name="selectedFileId">
                 <option value="-1">Upload new file</option>
                 <?php
-                foreach ($files as $file) {
+                foreach($files as $file) {
                     echo "<option value='{$file['file_id']}'>{$file['filename']}</option>";
                 }
                 ?>
@@ -292,7 +293,7 @@ $internships = getAllRecords($conn, 'internships');
             </tr>
 
             <?php
-            foreach ($courses as $course) {
+            foreach($courses as $course) {
                 echo "<tr>";
                 echo "<td><span>{$course['cour_id']}</span></td>";
                 echo "<td><span>{$course['cour_name']}</span></td>";
@@ -310,11 +311,11 @@ $internships = getAllRecords($conn, 'internships');
             </tr>
 
             <?php
-            foreach ($takencourses as $takencourse) {
+            foreach($takencourses as $takencourse) {
                 echo "<tr>";
                 echo "<td><span>{$takencourse['cour_id']}</span></td>";
                 echo "<td><span>{$takencourse['tc_semester']}</span></td>";
-                echo "<td><span>" . ($takencourse['tc_is_passed'] ? 'Yes' : 'No') . "</span></td>";
+                echo "<td><span>".($takencourse['tc_is_passed'] ? 'Yes' : 'No')."</span></td>";
                 echo "</tr>";
             }
             ?>
@@ -331,7 +332,7 @@ $internships = getAllRecords($conn, 'internships');
             <select name="selected_record_id">
                 <option value="add_new">Add new taken Course</option>
                 <?php
-                foreach ($takencourses as $takencourse) {
+                foreach($takencourses as $takencourse) {
                     echo "<option value='{$takencourse['cour_id']}'>{$takencourse['cour_id']}</option>";
                 }
                 ?>
@@ -369,19 +370,43 @@ $internships = getAllRecords($conn, 'internships');
             </tr>
 
             <?php
-            foreach ($internships as $internship) {
+            foreach($internships as $internship) {
                 echo "<tr>";
                 echo "<td><span>{$internship['intshp_id']}</span></td>";
                 echo "<td><span>{$internship['intshp_name']}</span></td>";
                 echo "<td><span>{$internship['intshp_year']}</span></td>";
                 echo "<td><span>{$internship['intshp_state']}</span></td>";
                 echo "<td><span>{$internship['intshp_country']}</span></td>";
-                echo "<td><span>{$internship['intshp_is_federal']}</span></td>";
+                echo "<td><span>".($internship['intshp_is_federal'] ? 'Yes' : 'No')."</span></td>";
                 echo "</tr>";
             }
             ?>
 
         </table>
+        <br>
+        <h4>Add an Internship</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="internships">
+            <input type="hidden" name="selected_record_id" value="add_new">
+            <label>Internship Name:</label>
+            <input type="text" name="intshp_name"><br>
+            <label>Internship Year:</label>
+            <input type="text" name="intshp_year"><br>
+            <label>Internship State:</label>
+            <input type="text" name="intshp_state"><br>
+            <label>Internship Country:</label>
+            <input type="text" name="intshp_country"><br>
+            <label>Internship Is Federal?:</label>
+            <select name="intshp_is_federal" id="intshp_is_federal">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <br>
+            <button type="submit" name="update_record">Add</button>
+        </form>
         <h4>Your Internships</h4>
         <table border="1">
             <tr>
@@ -390,7 +415,7 @@ $internships = getAllRecords($conn, 'internships');
             </tr>
 
             <?php
-            foreach ($studentinternships as $studentinternship) {
+            foreach($studentinternships as $studentinternship) {
                 echo "<tr>";
                 echo "<td><span>{$studentinternship['intshp_id']}</span></td>";
                 echo "<td><span>{$studentinternship['stin_app_status']}</span></td>";
@@ -410,7 +435,7 @@ $internships = getAllRecords($conn, 'internships');
             <select name="selected_record_id">
                 <option value="add_new">Add new Student Internship</option>
                 <?php
-                foreach ($studentinternships as $studentinternship) {
+                foreach($studentinternships as $studentinternship) {
                     echo "<option value='{$studentinternship['intshp_id']}'>{$studentinternship['intshp_id']}</option>";
                 }
                 ?>
@@ -430,16 +455,16 @@ $internships = getAllRecords($conn, 'internships');
     <!-- Repeat the above for internships, events, trainings, and certifications -->
 
     <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['insert'])) {
+    if($_SERVER["REQUEST_METHOD"] == "POST") {
+        if(isset($_POST['insert'])) {
             // Add your insert logic here
             // $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES (?, ?, ?, ?)";
-            $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES ('" . $_POST['app_date_applied'] . "', '" . $_POST['app_purpose'] . "', '" . $_POST['app_resume'] . "', '" . $_POST['app_type'] . "')";
-        } elseif (isset($_POST['update'])) {
+            $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES ('".$_POST['app_date_applied']."', '".$_POST['app_purpose']."', '".$_POST['app_resume']."', '".$_POST['app_type']."')";
+        } elseif(isset($_POST['update'])) {
             $app_id = $_POST['app_id'];
             // Add your update logic here
             // $sql = "UPDATE applications SET ... WHERE app_id = $app_id";
-        } elseif (isset($_POST['delete'])) {
+        } elseif(isset($_POST['delete'])) {
             $app_id = $_POST['app_id'];
             // Add your delete logic here
             // $sql = "DELETE FROM applications WHERE app_id = $app_id";
@@ -452,12 +477,12 @@ $internships = getAllRecords($conn, 'internships');
     echo "<table>";
     echo "<tr><th>Application ID</th><th>Date Applied</th><th>Purpose Statement</th><th>Resume</th><th>Type</th><th>Actions</th></tr>";
 
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr><td>" . $row["app_id"] . "</td><td>" . $row["app_date_applied"] . "</td><td>" . $row["app_purpose"] . "</td><td>" . $row["app_resume"] . "</td><td>" . $row["app_type"] . "</td>";
+    if($result->num_rows > 0) {
+        while($row = $result->fetch_assoc()) {
+            echo "<tr><td>".$row["app_id"]."</td><td>".$row["app_date_applied"]."</td><td>".$row["app_purpose"]."</td><td>".$row["app_resume"]."</td><td>".$row["app_type"]."</td>";
             echo "<td>
                     <form method='post'>
-                        <input type='hidden' name='app_id' value='" . $row["app_id"] . "'>
+                        <input type='hidden' name='app_id' value='".$row["app_id"]."'>
                         <input type='submit' name='update' value='Update'>
                         <input type='submit' name='delete' value='Delete'>
                     </form>
