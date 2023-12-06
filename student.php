@@ -9,8 +9,6 @@ if (!isset($_SESSION['user_id'])) {
 
 require 'utils/connect.php';
 
-
-
 $id = $_SESSION['user_id'];
 
 $sql = "SELECT * FROM users WHERE user_id = '$id'";

@@ -55,7 +55,7 @@ $available_programs = $result->fetch_all();
 <html>
 
 <head>
-    <title>Student Applications</title>
+    <title>Student Programs</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 <style>
