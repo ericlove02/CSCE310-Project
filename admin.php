@@ -62,8 +62,84 @@ function addRecord($conn, $tableName, $recordData)
     }
 }
 
+function generateReport($conn, $selectedReport)
+{
+    switch ($selectedReport) {
+        case 'report_cldp_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'CLDP'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_viceroy_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'VICEROY'";
+        case 'report_pathways_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'Pathways'";
+        case 'report_cybercorps_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'CyberCorps: Scholarship for Service'";
+        case 'report_dod_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'DoD Cybersecurity Scholarship'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        default:
+            return "Invalid report selected";
+    }
+}
+
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['generate_report'])) {
+        $selectedReport = $_POST['selected_report'];
+        $reportData = generateReport($conn, $selectedReport);
+    }
     if (isset($_POST['update_record'])) {
         $selectedRecordId = $_POST['selected_record_id'];
         $recordData = array();
@@ -171,21 +247,27 @@ $courses = getAllRecords($conn, 'courses');
 </head>
 
 <body>
-    <h2>Admin Page</h2>
+    <h1>Admin Page</h1>
     <section>
         <h3>Stats</h3>
-
         <ul>
             <?php
             // list of tables to get stats
             $tables = array(
                 "students",
-                "attendedevents",
                 "events",
+                "attendedevents",
+                "trainings",
                 "studenttrainings",
+                "certifications",
                 "studentcerts",
                 "programs",
                 "programenrollments",
+                "summercamps",
+                "internships",
+                "studentinternships",
+                "courses",
+                "takencourses",
                 "applications"
             );
 
@@ -196,6 +278,68 @@ $courses = getAllRecords($conn, 'courses');
             }
             ?>
         </ul>
+
+        <h3>Reports</h3>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <label>Select Report:</label>
+            <select name="selected_report">
+                <option value="report_cldp_stus">Number of total Cyber Leader Development Program students</option>
+                <option value="report_viceroy_stus">Number of total VICEROY students</option>
+                <option value="report_pathways_stus">Number of total Pathways students</option>
+                <option value="report_cybercorps_stus">Number of total CyberCorps: Scholarship for Service students
+                </option>
+                <option value="report_dod_stus">Number of total DoD Cybersecurity Scholarship Program students</option>
+                <option value="report_complete_all">Number of students to complete all course and certification
+                    opportunities</option>
+                <option value="report_strat_foreign">Number of students electing to take additional strategic foreign
+                    language courses</option>
+                <option value="report_crypto">Number of students electing to take other cryptography and cryptographic
+                    mathematics courses</option>
+                <option value="report_data_sci">Number of students electing to carry additional data science and related
+                    courses</option>
+                <option value="report_enroll_dod_cour">Number of students to enroll in DoD 8570.01M preparation training
+                    courses</option>
+                <option value="report_complete_dod_cour">Number of students to complete DoD 8570.01M preparation
+                    training courses</option>
+                <option value="report_enroll_dod_exam">Number of students to complete a DoD 8570.01M certification
+                    examination</option>
+                <option value="report_minority">Minority participation</option>
+                <option value="report_k_12_sc">Number of K-12 students enrolled in summer camps</option>
+                <option value="report_fed_interns">Number of students pursuing federal internships</option>
+                <option value="report_majors">Student majors</option>
+                <option value="report_intern_locs">Student internship locations</option>
+            </select>
+            <button type="submit" name="generate_report">Generate</button>
+        </form>
+
+        <?php
+        // display generate report content
+        if (isset($reportData)) {
+            echo "<h4>Generated Report</h4>";
+            if (is_array($reportData)) {
+                echo "<table border='1'>";
+                echo "<tr>";
+                foreach ($reportData[0] as $column => $value) {
+                    $formattedColumnName = ucwords(str_replace('_', ' ', $column));
+                    echo "<th>{$formattedColumnName}</th>";
+                }
+                echo "</tr>";
+                foreach ($reportData as $row) {
+                    echo "<tr>";
+                    foreach ($row as $column => $value) {
+                        echo "<td>{$value}</td>";
+                    }
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                // if just one item show just the piece of data
+                echo "<p>{$reportData}</p>";
+            }
+        }
+        ?>
+
     </section>
     <hr />
     <section>
