@@ -361,7 +361,7 @@ $users = getAllRecords($conn, 'users');
     </section>
     <hr />
     <section>
-        <h3>Users</h3>
+        <h3>User Authentication and Roles</h3>
         <table border="1">
             <tr>
                 <th>User Id</th>
@@ -381,7 +381,7 @@ $users = getAllRecords($conn, 'users');
                 header("Location: student.php");
                 return;
             }
-            
+
             foreach ($users as $user) {
                 echo "<tr>";
                 echo "<td><span>{$user['user_id']}</span></td>";
@@ -392,7 +392,7 @@ $users = getAllRecords($conn, 'users');
                 echo "<td><span>{$user['phone']}</span></td>";
                 echo "<td><span>{$user['password']}</span></td>";
                 echo "<td><span>" . ($user['is_admin'] ? 'Yes' : 'No') . "</span></td>";
-                echo "<td><form method='post' action='", htmlspecialchars($_SERVER["PHP_SELF"]) , "'> <input type='hidden' name='doChangeUser' value='1'> <input type='hidden' name='user_id' value='", $user['user_id'], "'> <button type='submit' name='submit'>Switch</button> </form></td>";
+                echo "<td><form method='post' action='", htmlspecialchars($_SERVER["PHP_SELF"]), "'> <input type='hidden' name='doChangeUser' value='1'> <input type='hidden' name='user_id' value='", $user['user_id'], "'> <button type='submit' name='submit'>Switch</button> </form></td>";
                 echo "</tr>";
             }
             ?>
@@ -418,7 +418,7 @@ $users = getAllRecords($conn, 'users');
 
             <label>First Name:</label>
             <input type="text" name="first_name"><br>
-            <label>First Name:</label>
+            <label>Last Name:</label>
             <input type="text" name="last_name"><br>
             <label>Middle Initial:</label>
             <input type="text" name="m_initial"><br>
@@ -440,7 +440,52 @@ $users = getAllRecords($conn, 'users');
     </section>
     <hr />
     <section>
-        <h3>Events</h3>
+        <h3>Program Information Management</h3>
+        <table border="1">
+            <tr>
+                <th>Program Id</th>
+                <th>Program Name</th>
+            </tr>
+
+            <?php
+            foreach ($programs as $program) {
+                echo "<tr>";
+                echo "<td><span>{$program['prog_id']}</span></td>";
+                echo "<td><span>{$program['prog_name']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify Program</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="programs">
+
+            <label>Select Program:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Program</option>
+                <?php
+                foreach ($programs as $program) {
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>Program Name:</label>
+            <input type="text" name="record_name"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <section>
+        <h3>Event Management</h3>
         <table border="1">
             <tr>
                 <th>Event Id</th>
@@ -553,7 +598,7 @@ $users = getAllRecords($conn, 'users');
         </table>
 
         <br>
-        <h4>Modify Training</h4>
+        <h4>Modify Certification</h4>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <input type="hidden" name="selected_table" value="certifications">
@@ -577,53 +622,7 @@ $users = getAllRecords($conn, 'users');
             <button type="submit" name="delete_record">Delete</button>
         </form>
     </section>
-    <hr />
-    <!-- Repeat similar sections for programs, summercamps, and courses -->
-    <section>
-        <h3>Programs</h3>
-        <table border="1">
-            <tr>
-                <th>Program Id</th>
-                <th>Program Name</th>
-            </tr>
-
-            <?php
-            foreach ($programs as $program) {
-                echo "<tr>";
-                echo "<td><span>{$program['prog_id']}</span></td>";
-                echo "<td><span>{$program['prog_name']}</span></td>";
-                echo "</tr>";
-            }
-            ?>
-
-        </table>
-
-        <br>
-        <h4>Modify Training</h4>
-
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-            <input type="hidden" name="selected_table" value="programs">
-
-            <label>Select Program:</label>
-            <select name="selected_record_id">
-                <option value="add_new">Add new Program</option>
-                <?php
-                foreach ($programs as $program) {
-                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']}</option>";
-                }
-                ?>
-            </select>
-            <br>
-
-            <label>Program Name:</label>
-            <input type="text" name="record_name"><br>
-
-            <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
-        </form>
-    </section>
-    <hr />
+    <!-- <hr />
     <section>
         <h3>Summer Camps</h3>
         <table border="1">
@@ -671,7 +670,7 @@ $users = getAllRecords($conn, 'users');
             <button type="submit" name="update_record">Update/Add</button>
             <button type="submit" name="delete_record">Delete</button>
         </form>
-    </section>
+    </section> -->
     <hr />
     <section>
         <h3>Courses</h3>
