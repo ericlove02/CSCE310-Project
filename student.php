@@ -45,19 +45,23 @@ function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_
 function updateRecord($conn, $tableName, $recordId, $recordData)
 {
     $updateValues = '';
+    $keyValues = '';
     foreach ($recordData as $column => $value) {
         if (strpos($column, '_id') !== false) {
-            $id_key = $column;
-            continue;
-        }
-        if ($value != '') {
+            $keyValues .= "$column = '$value' AND ";
+        } elseif ($value != '') {
+            // jank fix for joined tables
+            if ($column == "new_cour") {
+                $column = "cour_id";
+            }
             $updateValues .= "$column = '$value', ";
         }
     }
     $updateValues = rtrim($updateValues, ', ');
+    $keyValues = rtrim($keyValues, 'AND ');
 
-    $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
-    echo $sql;
+    $sql = "UPDATE $tableName SET $updateValues WHERE $keyValues";
+    // echo $sql;
     if ($conn->query($sql) !== TRUE) {
         echo "Error updating record: " . $conn->error;
     } else {
@@ -86,7 +90,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         // handle data based on selected table
         switch ($_POST['selected_table']) {
             case 'takencourses':
-                $recordData['cour_id'] = $_POST['cour_id'];
+                $recordData['cour_id'] = $_POST['selected_record_id'];
+                $recordData['new_cour'] = $_POST['new_cour'];
                 $recordData['user_id'] = $id;
                 $recordData['tc_semester'] = $_POST['tc_semester'];
                 $recordData['tc_is_passed'] = $_POST['tc_is_passed'];
@@ -305,7 +310,7 @@ $internships = getAllRecords($conn, 'studentinternships', $id);
             </select>
             <br>
             <label>Course Id:</label>
-            <input type="text" name="cour_id"><br>
+            <input type="text" name="new_cour"><br>
             <label>Semester:</label>
             <input type="text" name="tc_semester"><br>
             <label for="tc_is_passed">Course Is Passed?</label>
