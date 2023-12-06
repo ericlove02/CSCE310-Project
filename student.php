@@ -81,6 +81,53 @@ function createCheckbox($row, $key, $label)
         <input type="submit" value="Update">
     </form>
 
+<!-- File modification -->
+
+<section>
+    <table border="1">
+        <tr>
+            <th>User Documents</th>
+        </tr>
+
+        <?php
+        $result = $conn->execute_query("SELECT file_id, user_id, filename, mimetype FROM user_documents WHERE user_id = ?", [$id]);
+        if (!$result) {
+            die("Query failed: " . $conn->error);
+        }
+
+        $files = [];
+
+        while ($file = $result->fetch_assoc()) {
+            $files[] = $file;
+        }
+
+        foreach ($files as $file) {
+            echo "<tr>";
+            echo "<td><a href='utils/document.php?serve={$file['file_id']}'>{$file['filename']}</span></td>";
+            echo "</tr>";
+        }
+        ?>
+
+    </table>
+
+    <form action="utils/document.php?return=/student.php" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="fileUpload" value="1">
+        <select name="selectedFileId">
+            <option value="-1">Upload new file</option>
+            <?php
+            foreach ($files as $file) {
+                echo "<option value='{$file['file_id']}'>{$file['filename']}</option>";
+            }
+            ?>
+        </select> <br>
+        <input type="file" name="file" id="fileToUpload"> <br />
+        <input type="submit" value="Upload/Replace File" name="submit">
+        <input type="submit" value="Delete File" name="submit">
+
+
+    </form>
+</section>
+
 <!-- Fetch and display the student's taken courses -->
 <?php
 $sql = "SELECT courses.cour_id, courses.cour_name FROM takencourses 
