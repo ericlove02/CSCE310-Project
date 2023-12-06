@@ -204,6 +204,10 @@ $internships = getAllRecords($conn, 'internships');
         createInput($row, "password", "Password");
         // is_admin
         
+        // Don't try to show show student info if they are not a student
+        if ($stu_row != true)
+            die("<br><b>Not a student<b><br>");
+
         // student stuff
         createInput($stu_row, "stu_uin", "UIN"); // new
         
