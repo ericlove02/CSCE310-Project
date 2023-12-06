@@ -255,6 +255,7 @@ $users = getAllRecords($conn, 'users');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
+    <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -328,7 +329,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="report_majors">Student majors</option>
                 <option value="report_intern_locs">Student internship locations</option>
             </select>
-            <button type="submit" name="generate_report">Generate</button>
+            <button type="submit" name="generate_report" class="btn btn-dark">Generate</button>
         </form>
 
         <?php
@@ -392,7 +393,7 @@ $users = getAllRecords($conn, 'users');
                 echo "<td><span>{$user['phone']}</span></td>";
                 echo "<td><span>{$user['password']}</span></td>";
                 echo "<td><span>" . ($user['is_admin'] ? 'Yes' : 'No') . "</span></td>";
-                echo "<td><form method='post' action='", htmlspecialchars($_SERVER["PHP_SELF"]), "'> <input type='hidden' name='doChangeUser' value='1'> <input type='hidden' name='user_id' value='", $user['user_id'], "'> <button type='submit' name='submit'>Switch</button> </form></td>";
+                echo "<td><form method='post' action='", htmlspecialchars($_SERVER["PHP_SELF"]), "'> <input type='hidden' name='doChangeUser' value='1'> <input type='hidden' name='user_id' value='", $user['user_id'], "'> <button class='btn btn-dark'type='submit' name='submit'>Switch</button> </form></td>";
                 echo "</tr>";
             }
             ?>
@@ -434,8 +435,8 @@ $users = getAllRecords($conn, 'users');
             </select>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <hr />
@@ -479,8 +480,8 @@ $users = getAllRecords($conn, 'users');
             <input type="text" name="record_name"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <hr />
@@ -528,8 +529,8 @@ $users = getAllRecords($conn, 'users');
             <input type="text" name="record_loc"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <hr />
@@ -573,8 +574,8 @@ $users = getAllRecords($conn, 'users');
             <input type="text" name="record_name"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <hr />
@@ -618,8 +619,8 @@ $users = getAllRecords($conn, 'users');
             <input type="text" name="record_name"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <!-- <hr />
@@ -712,8 +713,8 @@ $users = getAllRecords($conn, 'users');
             <input type="text" name="record_name"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
     <?php

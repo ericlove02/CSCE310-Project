@@ -15,3 +15,8 @@ if ($conn->connect_error) {
 // echo "Connected successfully";
 
 ?>
+<style> /* Cool hack to pad every page */
+    body {
+        padding: 1em;
+    }
+</style>

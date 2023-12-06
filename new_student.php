@@ -110,9 +110,10 @@ function createDate($key, $label)
     echo "${label}: <input type=\"date\" name=\"${key}\" required><br>";
 }
 
-function createSelection($key, $label, $assoc_name_value) {
+function createSelection($key, $label, $assoc_name_value)
+{
     echo "${label}: <select name=\"$key\">";
-    foreach($assoc_name_value as $name => $value) {
+    foreach ($assoc_name_value as $name => $value) {
         echo "<option value=\"${value}\">${name}</option>";
     }
     echo "</select><br>";
@@ -122,9 +123,12 @@ function createSelection($key, $label, $assoc_name_value) {
 
 <!DOCTYPE html>
 <html>
+
 <head>
     <title>New student</title>
+    <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
+
 <body>
     <h2>New Student</h2>
     <form method="post">
@@ -147,7 +151,7 @@ function createSelection($key, $label, $assoc_name_value) {
         createCheckbox("stu_firstgen", "First generation college student?");
 
         createDate("stu_dob", "Date of Birth");
-        createInput("stu_discord", "Discord username"); 
+        createInput("stu_discord", "Discord username");
         createDefaultInput("stu_school", "School", "Texas A&M University");
         createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
         createDate("stu_grad_expect", "Expected graduation date");
