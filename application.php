@@ -1,4 +1,17 @@
 <?php
+
+function fetch_application($user_id, $prog_id) {
+    require 'utils/connect.php';
+
+    $sql = "SELECT * FROM applications WHERE user_id = '$user_id' AND prog_id = '$prog_id'";
+    $result = $conn->query($sql);
+    $application = $result->fetch_assoc();
+
+    $conn->close();
+
+    return $application;
+}
+
 session_start();
 
 // Check if the user is logged in
@@ -9,36 +22,74 @@ if (!isset($_SESSION['user_id'])) {
 
 require 'utils/connect.php';
 
-// get user
-$id = $_SESSION['user_id'];
-$sql = "SELECT * FROM users WHERE user_id = '$id'";
-$result = $conn->query($sql);
-$user = $result->fetch_assoc();
-
-// get id from url
-$prog_id = $_GET['id'];
-
-// get program
-$sql = "SELECT programs.prog_name, programs.prog_id FROM programs WHERE programs.prog_id = '$prog_id'";
-$result = $conn->query($sql);
-$program = $result->fetch_assoc();
-
 // check if post request was made
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
     $prog_id = $_POST['prog_id'];
     $user_id = $_POST['user_id'];
-    $application = $_POST['application'];
+    $purpose_statement= $_POST['purpose_statement'];
     $oncom_cert = $_POST['oncom_cert'];
-    $oncom_cert = $_POST['com_cert'];
+    $com_cert = $_POST['com_cert'];
 
-    $sql = "INSERT INTO applications (prog_id, user_id, , oncom_cert, oncom_cert) VALUES ('$prog_id', '$user_id', '$application', '$oncom_cert', '$oncom_cert')";
+    // check if the user has already applied
+    $application = fetch_application($user_id, $prog_id);
+    if ($application) {
+        $sql = $conn->prepare("UPDATE applications SET app_purpose_statement = ?, uncom_cert = ?, com_cert = ? WHERE user_id = $user_id AND prog_id = $prog_id");
+        $result = $sql->execute([$purpose_statement, $oncom_cert, $com_cert]);
+    }
 
-    if ($conn->query($sql) === TRUE) {
+    $sql = $conn->prepare("INSERT INTO APPLICATIONS (prog_id, user_id, app_purpose_statement, uncom_cert, com_cert) VALUES ($prog_id, $user_id, ?, ?, ?);");
+    $result = $sql->execute([$purpose_statement, $oncom_cert, $com_cert]);
+
+    if ($result) {
         echo "Application submitted successfully";
+        header("Location: program_dir.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
 }
+
+else if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "DELETE") { 
+    $prog_id = $_POST['prog_id'];
+    $user_id = $_POST['user_id'];
+
+    $sql = "DELETE FROM applications WHERE user_id = $user_id AND prog_id = $prog_id";
+    $result = $conn->query($sql);
+
+    if ($result) {
+        echo "Application deleted successfully";
+        header("Location: program_dir.php");
+    } else {
+        echo "Error: " . $sql . "<br>" . $conn->error;
+    }
+}
+
+else if ($_SERVER["REQUEST_METHOD"] == "GET") {
+    echo "WHY ARE WE HERE";
+
+    // get user
+    $id = $_SESSION['user_id'];
+    $sql = "SELECT * FROM users WHERE user_id = '$id'";
+    $result = $conn->query($sql);
+    $user = $result->fetch_assoc();
+
+    // get id from url
+    $prog_id = $_GET['id'];
+
+    // get program
+    $sql = "SELECT programs.prog_name, programs.prog_id FROM programs WHERE programs.prog_id = '$prog_id'";
+    $result = $conn->query($sql);
+    $program = $result->fetch_assoc();
+
+    // if the user has already applied, populate the form with their previous answers
+    $application = fetch_application($id, $prog_id);
+    if ($application) {
+        $purpose_statement = $application['app_purpose_statement'];
+        $uncom_cert = $application['uncom_cert'];
+        $com_cert = $application['com_cert'];
+    }
+}
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -48,20 +99,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </head>
 
     <body>
+        <button><a href="/program_dir.php"> Go Back </a></button>
         <h1>Applications for <?php echo $program['prog_name']?></h1>
-        <form method="post" action="application.php">
+        <form method="POST" action="application.php">
+            <input type="hidden" name="req_type" value="PUT">
             <input type="hidden" name="prog_id" value="<?php echo $program['prog_id']?>">
             <input type="hidden" name="user_id" value="<?php echo $id?>">
             <label>Why do you want to join this program?</label><br>
-            <textarea name="application" rows="10" cols="50"></textarea><br>
+            <textarea name="purpose_statement" rows="10" cols="50" required>
+                <?php echo isset($purpose_statement) ? $purpose_statement : '' ?>
+            </textarea><br>
 
-            <label>Are you currently enrolled in other uncompleted certifications sponsored by the Cybersecurity Center? </label> <br>
-            <textarea name="oncom_cert" rows="5" cols="50"></textarea><br> 
+            <label>Are you currently enrolled in other uncompleted certifications sponsored by the Cybersecurity Center? (Optional) </label> <br>
+            <textarea name="oncom_cert" rows="5" cols="50">
+                </textarea><?php echo isset($uncom_cert) ? $uncom_cert : '' ?><br> 
 
-            <label>Have you completed any cybersecurity industry certifications via the Cybersecurity Center?  </label> <br>
-            <textarea name="com_cert" rows="5" cols="50"></textarea><br> 
+            <label>Have you completed any cybersecurity industry certifications via the Cybersecurity Center? (Optional) </label> <br>
+            <textarea name="com_cert" rows="5" cols="50">
+                <?php echo isset($com_cert)? $com_cert : '' ?>
+            </textarea><br> 
             
-            <button type="submit">Submit</button>
+            <button type="submit" value="Submit">Submit</button>
+            <?php 
+                if ($application) {
+                    echo '<form action="program_dir.php" method="POST">
+                            <input type="hidden" name="req_type" value="DELETE">
+                            <input type="hidden" name="prog_id" value="' . $program['prog_id'] . '">
+                            <input type="hidden" name="user_id" value="' . $id . '">
+                            <input type="submit" value="Delete">
+                        </form>';
+                } 
+            ?>
         </form> 
     </body>
 </html>

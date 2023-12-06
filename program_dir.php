@@ -22,33 +22,43 @@ SELECT * FROM programs
 WHERE programs.prog_id IN ( 
     SELECT programenrollments.prog_id 
     FROM programenrollments 
-    WHERE programenrollments.user_id = ${id} AND programenrollments.pe_enroll_pending = 0
+    WHERE programenrollments.user_id = ${id} 
 );";
 
 $result = $conn->query($sql);
 $enrolled_programs = $result->fetch_all();
 
-// get pending programs
+// get pending programs (application but not enrolled)
 $sql = "
 SELECT * FROM programs
-WHERE programs.prog_id IN ( 
+WHERE programs.prog_id NOT IN( 
     SELECT programenrollments.prog_id 
     FROM programenrollments 
-    WHERE programenrollments.user_id = ${id} AND programenrollments.pe_enroll_pending = 1
+    WHERE programenrollments.user_id = ${id} 
+) AND programs.prog_id IN (
+    SELECT applications.prog_id
+    FROM applications
+    WHERE applications.user_id = ${id}
 );";
 $result = $conn->query($sql);
 $pending_programs = $result->fetch_all();
 
 // get available programs
 $sql = "
-SELECT * FROM programs 
-WHERE programs.prog_id NOT IN ( 
+SELECT * FROM programs
+WHERE programs.prog_id NOT IN( 
     SELECT programenrollments.prog_id 
     FROM programenrollments 
     WHERE programenrollments.user_id = ${id} 
+) AND programs.prog_id NOT IN(
+    SELECT applications.prog_id
+    FROM applications
+    WHERE applications.user_id = ${id} 
 );";
 $result = $conn->query($sql);
 $available_programs = $result->fetch_all();
+
+$conn->close();
 ?>
 
 <!DOCTYPE html>
@@ -83,7 +93,7 @@ function generateProgramTable($title, $programs) {
         $action_url = 'track_program.php';
     } else if ($title == 'Pending Programs') {
         $action_label = 'View Applications';
-        $action_url = 'view_appliation.php';
+        $action_url = 'application.php';
     } else if ($title == 'Available Programs') {
         $action_label = 'Apply';
         $action_url = 'application.php';
