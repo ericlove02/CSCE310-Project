@@ -27,6 +27,7 @@ $stu_row =  $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_
 </head>
 
 <body>
+    <h2>Student Information</h2>
     <form method="post" action="utils/update.php">
         <?php
 
@@ -40,7 +41,7 @@ function createInput($row, $key, $label)
 function createCheckbox($row, $key, $label)
 {
     $val = $row[$key] == 1 ? 'checked' : '';
-    echo "${label}: <input type=\"checkbox\" name=\"${key}\" ${val}><br>";
+    echo "${label}:   <input type='hidden' value='0' name='${key}'>    <input type=\"checkbox\" name=\"${key}\" value='1' {$val}><br>";
 }
 
         createInput($row,"email", "Email");
@@ -77,7 +78,7 @@ function createCheckbox($row, $key, $label)
         ?>
         
         <!-- Add more fields as needed -->
-        <input type="submit" value="Save">
+        <input type="submit" value="Update">
     </form>
 
 <!-- Fetch and display the student's taken courses -->

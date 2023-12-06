@@ -274,7 +274,14 @@ $courses = getAllRecords($conn, 'courses');
             // loop through list
             foreach ($tables as $table) {
                 $rowCount = getTableRowCount($conn, $table);
-                echo "<li>Total number of $table: $rowCount</li>";
+                $tableName = array(
+                    "attendedevents" => "attended events",
+                    "studenttrainings" => "student trainings",
+                    "studentcerts" => "student certifications",
+                    "programenrollments" => "program enrollments"
+                )[$table] ?? $table;
+                
+                echo "<li>Total number of $tableName: $rowCount</li>";
             }
             ?>
         </ul>

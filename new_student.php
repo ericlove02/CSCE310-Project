@@ -87,7 +87,7 @@ function checkboxToInt($val)
 function createInput($key, $label)
 {
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
-    echo "${label}: <input type=\"text\" name=\"${key}\"><br>";
+    echo "${label}: <input type=\"text\" name=\"${key}\" required><br>";
 }
 
 function createCheckbox($key, $label)
@@ -100,9 +100,11 @@ function createCheckbox($key, $label)
 
 <!DOCTYPE html>
 <html>
-
+<head>
+    <title>New student</title>
+</head>
 <body>
-
+    <h2>New Student</h2>
     <form method="post">
         <?php
 
