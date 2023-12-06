@@ -54,7 +54,7 @@ function addRecord($conn, $tableName, $recordData)
     $columns = implode(', ', array_keys($recordData));
     $values = "'" . implode("', '", array_values($recordData)) . "'";
     $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-
+    echo $sql;
     if ($conn->query($sql) !== TRUE) {
         echo "Error adding new record: " . $conn->error;
     } else {
