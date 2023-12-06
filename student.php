@@ -144,6 +144,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 case 'takencourses':
                     $sql = "DELETE FROM $selectedTable WHERE cour_id = $selectedRecordId AND user_id = $id";
                     break;
+                case 'studentinternships':
+                    $sql = "DELETE FROM $selectedTable WHERE intshp_id = $selectedRecordId AND user_id = $id";
+                    break;
                 default:
                     // default case
                     echo "Invalid table selected";
