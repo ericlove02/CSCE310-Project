@@ -50,10 +50,7 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
         if (strpos($column, '_id') !== false) {
             $keyValues .= "$column = '$value' AND ";
         } elseif ($value != '') {
-            // jank fix for joined tables
-            if ($column == "new_cour") {
-                $column = "cour_id";
-            }
+            $column = fixJoinTableVariables($column);
             $updateValues .= "$column = '$value', ";
         }
     }
@@ -71,14 +68,35 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
 
 function addRecord($conn, $tableName, $recordData)
 {
-    $columns = implode(', ', array_keys($recordData));
-    $values = "'" . implode("', '", array_values($recordData)) . "'";
+    $fixedRecordData = array();
+    foreach ($recordData as $columnName => $value) {
+        $fixedColumnName = fixJoinTableVariables($columnName);
+        $fixedRecordData[$fixedColumnName] = $value;
+    }
+    $columns = implode(', ', array_keys($fixedRecordData));
+    $filteredValues = array_filter(array_values($recordData), function ($value) {
+        return $value !== "add_new";
+    });
+
+    $values = "'" . implode("', '", $filteredValues) . "'";
     $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    echo $sql;
+    // echo $sql;
     if ($conn->query($sql) !== TRUE) {
         echo "Error adding new record: " . $conn->error;
     } else {
         echo "New entry to $tableName added";
+    }
+}
+
+function fixJoinTableVariables($columnName)
+{
+    // jank fix for joined tables
+    if ($columnName == "new_cour") {
+        return "cour_id";
+    } elseif ($columnName == "new_intshp") {
+        return "intshp_id";
+    } else {
+        return $columnName;
     }
 }
 
@@ -95,6 +113,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $recordData['user_id'] = $id;
                 $recordData['tc_semester'] = $_POST['tc_semester'];
                 $recordData['tc_is_passed'] = $_POST['tc_is_passed'];
+                break;
+            case 'studentinternships':
+                $recordData['intshp_id'] = $_POST['selected_record_id'];
+                $recordData['new_intshp'] = $_POST['new_intshp'];
+                $recordData['user_id'] = $id;
+                $recordData['stin_app_status'] = $_POST['app_status'];
                 break;
             default:
                 // default case
@@ -138,7 +162,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 $takencourses = getAllRecords($conn, 'takencourses', $id, 'courses', 'cour_id');
 $courses = getAllRecords($conn, 'courses');
 $applications = getAllRecords($conn, 'applications', $id);
-$internships = getAllRecords($conn, 'studentinternships', $id);
+$studentinternships = getAllRecords($conn, 'studentinternships', $id, 'internships', 'intshp_id');
+$internships = getAllRecords($conn, 'internships');
 
 ?>
 
@@ -273,7 +298,7 @@ $internships = getAllRecords($conn, 'studentinternships', $id);
             ?>
 
         </table>
-        <h4>All Courses</h4>
+        <h4>Your Courses</h4>
         <table border="1">
             <tr>
                 <th>Course Id</th>
@@ -327,14 +352,6 @@ $internships = getAllRecords($conn, 'studentinternships', $id);
     </section>
 
     <!-- Fetch and display the student's internships -->
-    <?php
-    $sql = "SELECT internships.* FROM internships 
-        INNER JOIN studentinternships ON internships.intshp_id = studentinternships.intshp_id 
-        WHERE studentinternships.user_id = '$id'";
-    $result = $conn->query($sql);
-    ?>
-
-    
     <section>
         <h3>Internships</h3>
         <h4>All Internships</h4>
@@ -342,71 +359,70 @@ $internships = getAllRecords($conn, 'studentinternships', $id);
             <tr>
                 <th>Internship Id</th>
                 <th>Internship Name</th>
-                <th>Internship Status</th>
-                <!-- Add other columns as needed -->
+                <th>Internship Year</th>
+                <th>Internship State</th>
+                <th>Internship Country</th>
+                <th>Internship Is Federal?</th>
             </tr>
 
             <?php
-            // Replace with your actual function to fetch internships
-            // $internships = getAllInternships($id); 
-
             foreach ($internships as $internship) {
                 echo "<tr>";
-                echo "<td><span>{$internship['internship_id']}</span></td>";
-                echo "<td><span>{$internship['user_id']}</span></td>";
-                echo "<td><span>{$internship['stin_app_status']}</span></td>";
-                // Add other columns as needed
+                echo "<td><span>{$internship['intshp_id']}</span></td>";
+                echo "<td><span>{$internship['intshp_name']}</span></td>";
+                echo "<td><span>{$internship['intshp_year']}</span></td>";
+                echo "<td><span>{$internship['intshp_state']}</span></td>";
+                echo "<td><span>{$internship['intshp_country']}</span></td>";
+                echo "<td><span>{$internship['intshp_is_federal']}</span></td>";
                 echo "</tr>";
             }
             ?>
 
         </table>
-        <br>
-    <h4>Modify Your Internship</h4>
+        <h4>Your Internships</h4>
+        <table border="1">
+            <tr>
+                <th>Internship Id</th>
+                <th>Internship Application Status</th>
+            </tr>
 
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <input type="hidden" name="selected_table" value="studentinternships">
-
-        <label>Select Internship:</label>
-        <select name="selected_record_id">
-            <option value="add_new">Add new Internship</option>
             <?php
-            foreach ($internships as $internship) {
-                echo "<option value='{$internship['internship_id']}'>{$internship['internship_id']}</option>";
+            foreach ($studentinternships as $studentinternship) {
+                echo "<tr>";
+                echo "<td><span>{$studentinternship['intshp_id']}</span></td>";
+                echo "<td><span>{$studentinternship['stin_app_status']}</span></td>";
+                echo "</tr>";
             }
             ?>
-        </select>
-        <br>
-        <label>Internship Id:</label>
-        <input type="text" name="internship_id"><br>
-        <label>Internship Name:</label>
-        <input type="text" name="internship_name"><br>
-        <label>Internship Status:</label>
-        <input type="text" name="stin_app_status"><br>
-        <!-- Add other fields as needed -->
-        <input type="submit" name="submit" value="Submit">
-    </form>
-    </section>
 
-    <table>
-        <tr>
-            <th>Internship ID</th>
-            <th>Internship Name</th>
-            <th>Internship Year</th>
-            <!-- Add more headers as needed -->
-        </tr>
-        <?php
-        if ($result->num_rows > 0) {
-            // output data of each row
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr><td>" . $row["intshp_id"] . "</td><td>" . $row["intshp_name"] . "</td><td>" . $row["intshp_year"] . "</td></tr>";
-                // Add more columns as needed
-            }
-        } else {
-            echo "<tr><td colspan='2'>No results</td></tr>";
-        }
-        ?>
-    </table>
+        </table>
+
+        <br>
+        <h4>Modify Your Internships</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="studentinternships">
+
+            <label>Select Internship:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new Student Internship</option>
+                <?php
+                foreach ($studentinternships as $studentinternship) {
+                    echo "<option value='{$studentinternship['intshp_id']}'>{$studentinternship['intshp_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+            <label>Internship Id:</label>
+            <input type="text" name="new_intshp"><br>
+            <label>Application Status:</label>
+            <input type="text" name="app_status"><br>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
+    </section>
 
     <!-- Repeat the above for internships, events, trainings, and certifications -->
 
