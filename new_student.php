@@ -35,7 +35,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $stu_in_corp = checkBoxToInt(@$_POST["stu_in_corp"]); // Student in corps
     $stu_in_cyber_club = checkBoxToInt(@$_POST["stu_in_cyber_club"]); // Student in cs club
     $stu_in_women_cyber = checkBoxToInt(@$_POST["stu_in_women_cyber"]); // Student in women in cybersec
-    
+
     // Make sure there are no other users with the same email / uin
     $has_existing_user = $conn->query("SELECT * FROM users WHERE email = '$email'");
     if ($has_existing_user->num_rows > 0) {
@@ -87,15 +87,15 @@ function checkboxToInt($val)
 
 
 // UI generators
-function createInput($key, $label)
+function createInput($key, $label, $bootstrapClass = "")
 {
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
-    echo "${label}: <input type=\"text\" name=\"${key}\" required><br>";
+    echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\"></div>";
 }
-function createDefaultInput($key, $label, $default)
+function createDefaultInput($key, $label, $default, $bootstrapClass = "")
 {
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
-    echo "${label}: <input type=\"text\" name=\"${key}\" value=\"${default}\" required><br>";
+    echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\" value=\"${default}\"></div>";
 }
 
 function createCheckbox($key, $label)
@@ -104,10 +104,10 @@ function createCheckbox($key, $label)
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
 }
 
-function createDate($key, $label)
+function createDate($key, $label, $bootstrapClass = null)
 {
     // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
-    echo "${label}: <input type=\"date\" name=\"${key}\" required><br>";
+    echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"date\" class=\"form-control\" name=\"${key}\"></div>";
 }
 
 function createSelection($key, $label, $assoc_name_value)
@@ -132,35 +132,58 @@ function createSelection($key, $label, $assoc_name_value)
 <body>
     <h2>New Student</h2>
     <form method="post">
+        <div class="form-row row">
+            <?php
+            createInput("email", "Email", "col-md-3");
+            createInput("password", "Password", "col-md-3");
+            createInput("stu_uin", "UIN", "col-md-3");
+            createInput("phone", "Phone", "col-md-3");
+            ?>
+        </div>
+        <div class="form-row row">
+            <?php
+            createInput("f_name", "First Name", "col-md-5");
+            createInput("l_name", "Last Name", "col-md-2");
+            createInput("m_initial", "Middle Initial", "col-md-5");
+            ?>
+        </div>
+        <div class="form-row row">
+            <?php
+            createInput("stu_gender", "Gender", "col-md-4");
+            createDate("stu_dob", "Date of Birth", "col-md-4");
+            createInput("stu_discord", "Discord username", "col-md-4");
+            ?>
+        </div>
+        <?php
+        createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
+        ?>
+        <div class="form-row row">
+            <?php
+            createDefaultInput("stu_school", "School", "Texas A&M University", "col-md-4");
+            createDate("stu_grad_expect", "Expected graduation date", "col-md-4");
+            ?>
+        </div>
         <?php
 
-        createInput("email", "Email");
-        createInput("f_name", "First Name");
-        createInput("l_name", "Last Name");
-        createInput("m_initial", "Middle Initial");
-        createInput("phone", "Phone");
-        createInput("password", "Password");
         // is_admin
         
         // student stuff
-        createInput("stu_uin", "UIN"); 
         
-        createInput("stu_gender", "Gender");
+
         createCheckbox("stu_hisp_latino", "Hispanic?");
         createCheckbox("stu_uscitizen", "US Citizen?");
         createCheckbox("stu_firstgen", "First generation college student?");
-
-        createDate("stu_dob", "Date of Birth");
-        createInput("stu_discord", "Discord username");
-        createDefaultInput("stu_school", "School", "Texas A&M University");
-        createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
-        createDate("stu_grad_expect", "Expected graduation date");
-        createInput("stu_major", "Student major");
-        createDefaultInput("stu_major2", "Student major 2", "N/A");
-        createDefaultInput("stu_minor", "Student minor", "N/A");
-        createDefaultInput("stu_minor2", "Student minor 2", "N/A"); // new
-        
-        createInput("stu_gpa", "Student GPA"); // new
+        ?>
+        <div class="form-row row">
+            <?php
+            createInput("stu_major", "Student major", "col-md-3");
+            createDefaultInput("stu_major2", "Student major 2", "N/A", "col-md-3");
+            createDefaultInput("stu_minor", "Student minor", "N/A", "col-md-2");
+            createDefaultInput("stu_minor2", "Student minor 2", "N/A", "col-md-2"); // new
+            createInput("stu_gpa", "Student GPA", "col-md-2"); // new
+            ?>
+        </div>
+        <?php
         createCheckbox("stu_in_rotc", "In ROTC?"); // new 
         createCheckbox("stu_in_corp", "In Corps of Cadets?"); // new
         createCheckbox("stu_in_cyber_club", "In Cybersecurity Club?"); // new
