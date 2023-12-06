@@ -171,7 +171,7 @@ $result = $conn->query($sql);
             // $sql = "DELETE FROM applications WHERE app_id = $app_id";
         }
     }
-
+    //bruh
     $sql = "SELECT * FROM applications WHERE user_id = '$id'";
     $result = $conn->query($sql);
 
