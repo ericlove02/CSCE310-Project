@@ -182,6 +182,7 @@ $internships = getAllRecords($conn, 'internships');
 
 <head>
     <title>Student Information</title>
+    <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -190,10 +191,10 @@ $internships = getAllRecords($conn, 'internships');
         <?php
 
 
-        function createInput($row, $key, $label)
+        function createInput($row, $key, $label, $bootstrapClass = "")
         {
             $val = $row[$key];
-            echo "${label}: <input type=\"text\" name=\"${key}\" value=\"${val}\"><br>";
+            echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\" value=\"${val}\"></div>";
         }
 
         function createCheckbox($row, $key, $label)
@@ -205,13 +206,21 @@ $internships = getAllRecords($conn, 'internships');
         <span>UIN:
             <?php echo $id ?>
         </span><br>
+        <div class="form-row row">
+            <?php
+            createInput($row, "email", "Email", "col-md-4");
+            createInput($row, "phone", "Phone", "col-md-4");
+            createInput($row, "password", "Password", "col-md-4");
+            ?>
+        </div>
+        <div class="form-row row">
+            <?php
+            createInput($row, "f_name", "First Name", "col-md-4");
+            createInput($row, "m_initial", "Middle Initial", "col-md-2");
+            createInput($row, "l_name", "Last Name", "col-md-6"); ?>
+        </div>
         <?php
-        createInput($row, "email", "Email");
-        createInput($row, "f_name", "First Name");
-        createInput($row, "l_name", "Last Name");
-        createInput($row, "m_initial", "Middle Initial");
-        createInput($row, "phone", "Phone");
-        createInput($row, "password", "Password");
+
         // is_admin
         
         // Don't try to show show student info if they are not a student
@@ -220,33 +229,47 @@ $internships = getAllRecords($conn, 'internships');
 
         // student stuff
         // createInput($stu_row, "stu_uin", "UIN"); // new
-        
-        createInput($stu_row, "stu_gender", "Gender");
+        ?>
+        <div class="form-row row">
+            <?php
+            createInput($stu_row, "stu_gender", "Gender", "col-md-4");
+            createInput($stu_row, "stu_dob", "Date of Birth", "col-md-4");
+            ?>
+        </div>
+        <?php
         createCheckbox($stu_row, "stu_hisp_latino", "Hispanic?");
         createCheckbox($stu_row, "stu_uscitizen", "US Citizen?");
         createCheckbox($stu_row, "stu_firstgen", "First generation college student?");
-
-        createInput($stu_row, "stu_dob", "Date of Birth");
-        createInput($stu_row, "stu_discord", "Discord username");
-        createInput($stu_row, "stu_school", "School");
-        createInput($stu_row, "stu_classification", "Student classification");
-        createInput($stu_row, "stu_grad_expect", "Expected graduation date");
-        createInput($stu_row, "stu_major", "Student major");
-        createInput($stu_row, "stu_major2", "Student major 2");
-        createInput($stu_row, "stu_minor", "Student minor");
-        createInput($stu_row, "stu_minor2", "Student minor 2"); // new
-        
-        createInput($stu_row, "stu_gpa", "Student GPA"); // new
-        createCheckbox($stu_row, "stu_in_rotc", "In ROTC?"); // new 
+        ?>
+        <div class="form-row row">
+            <?php
+            createInput($stu_row, "stu_discord", "Discord username", "col-md-3");
+            createInput($stu_row, "stu_school", "School", "col-md-4");
+            createInput($stu_row, "stu_classification", "Student classification", "col-md-3");
+            createInput($stu_row, "stu_grad_expect", "Expected graduation date", "col-md-2");
+            ?>
+        </div>
+        <div class="form-row row">
+            <?php
+            createInput($stu_row, "stu_major", "Student major", "col-md-3");
+            createInput($stu_row, "stu_major2", "Student major 2", "col-md-3");
+            createInput($stu_row, "stu_minor", "Student minor", "col-md-3");
+            createInput($stu_row, "stu_minor2", "Student minor 2", "col-md-3"); // new
+            ?>
+        </div>
+        <?php
+        createInput($stu_row, "stu_gpa", "Student GPA", "col-md-2"); // new
+        createCheckbox($stu_row, "stu_in_rotc", "In ROTC?"); // new
         createCheckbox($stu_row, "stu_in_corp", "In Corps of Cadets?"); // new
         createCheckbox($stu_row, "stu_in_cyber_club", "In Cybersecurity Club?"); // new
         createCheckbox($stu_row, "stu_in_women_cyber", "In Women in Cybersecurity?"); // new
         ?>
 
-        <input type="submit" name="submit" value="Update">
-
-        <input type="submit" name="submit" onclick="return confirm('Are you sure you want to deactivate your account?')"
-            value="Deactivate account">
+        <button type="submit" name="submit" class="btn btn-dark">Update
+        </button>
+        <button type="submit" name="submit" class="btn btn-dark"
+            onclick="return confirm('Are you sure you want to deactivate your account?')">
+            Deactivate Account</button>
     </form>
 
     <!-- File modification -->
@@ -289,8 +312,8 @@ $internships = getAllRecords($conn, 'internships');
                 ?>
             </select> <br>
             <input type="file" name="file" id="fileToUpload"> <br />
-            <input type="submit" value="Upload/Replace File" name="submit">
-            <input type="submit" value="Delete File" name="submit">
+            <input type="submit" value="Upload/Replace File" name="submit" class="btn btn-dark">
+            <input type="submit" value="Delete File" name="submit" class="btn btn-dark">
 
 
         </form>
@@ -363,8 +386,8 @@ $internships = getAllRecords($conn, 'internships');
             </select>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
 
@@ -418,7 +441,7 @@ $internships = getAllRecords($conn, 'internships');
             </select>
 
             <br>
-            <button type="submit" name="update_record">Add</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Add</button>
         </form>
         <h4>Your Internships</h4>
         <table border="1">
@@ -460,8 +483,8 @@ $internships = getAllRecords($conn, 'internships');
             <input type="text" name="app_status"><br>
 
             <br>
-            <button type="submit" name="update_record">Update/Add</button>
-            <button type="submit" name="delete_record">Delete</button>
+            <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
+            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
     </section>
 
@@ -511,7 +534,7 @@ $internships = getAllRecords($conn, 'internships');
         <input type="text" id="app_resume" name="app_resume"><br>
         <label for="app_type">Type:</label><br>
         <input type="text" id="app_type" name="app_type"><br>
-        <input type="submit" name="insert" value="Insert">
+        <input type="submit" name="insert" value="Insert" class="btn btn-dark">
     </form>
 </body>
 

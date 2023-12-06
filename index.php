@@ -39,6 +39,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
 <body>
@@ -50,12 +51,12 @@ $conn->close();
         <label>Password:</label>
         <input type="password" name="password" required><br>
 
-        <button type="submit">Sign In</button>
+        <button type="submit" class="btn btn-dark">Sign In</button>
     </form>
 
     <br>
 
-    <a href="new_student.php"><button>Sign Up</button></a>
+    <a href="new_student.php"><button class="btn btn-dark">Sign Up</button></a>
 </body>
 
 </html>
