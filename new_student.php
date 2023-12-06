@@ -45,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     $has_existing_uin = $conn->query("SELECT * FROM users WHERE user_id = $stu_uin");
-    if ($has_existing_user->num_rows > 0) {
+    if ($has_existing_uin->num_rows > 0) {
         echo "User already exists with uin ${stu_uin}<br>";
         http_response_code(500);
         return;
