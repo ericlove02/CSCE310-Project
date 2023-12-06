@@ -62,20 +62,104 @@ function addRecord($conn, $tableName, $recordData)
     }
 }
 
+function generateReport($conn, $selectedReport)
+{
+    switch ($selectedReport) {
+        case 'report_cldp_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'CLDP'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_viceroy_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'VICEROY'";
+        case 'report_pathways_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'Pathways'";
+        case 'report_cybercorps_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'CyberCorps: Scholarship for Service'";
+        case 'report_dod_stus':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS enrolled_students,
+                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
+                    FROM
+                        students s
+                    JOIN
+                        programenrollments pe ON s.user_id = pe.user_id
+                    JOIN
+                        programs p ON pe.prog_id = p.prog_id
+                    WHERE
+                        p.prog_name = 'DoD Cybersecurity Scholarship'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        default:
+            return "Invalid report selected";
+    }
+}
+
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['generate_report'])) {
+        $selectedReport = $_POST['selected_report'];
+        $reportData = generateReport($conn, $selectedReport);
+    }
     if (isset($_POST['update_record'])) {
         $selectedRecordId = $_POST['selected_record_id'];
         $recordData = array();
 
         // handle data based on selected table
         switch ($_POST['selected_table']) {
+            case 'users':
+                $recordData['user_id'] = $_POST['selected_record_id'];
+                $recordData['f_name'] = $_POST['first_name'];
+                $recordData['l_name'] = $_POST['last_name'];
+                $recordData['m_initial'] = $_POST['m_initial'];
+                $recordData['phone'] = $_POST['phone'];
+                $recordData['password'] = $_POST['password'];
+                $recordData['is_admin'] = $_POST['is_admin'];
+                break;
             case 'events':
                 $recordData['event_id'] = $_POST['selected_record_id'];
                 $recordData['event_name'] = $_POST['record_name'];
                 $recordData['event_location'] = $_POST['record_loc'];
                 break;
-
             case 'trainings':
                 $recordData['train_id'] = $_POST['selected_record_id'];
                 $recordData['train_name'] = $_POST['record_name'];
@@ -119,6 +203,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             echo '<script>alert("Error: Cannot delete a new record.");</script>';
         } else {
             switch ($_POST['selected_table']) {
+                case 'users':
+                    $sql = "DELETE FROM $selectedTable WHERE user_id = $selectedRecordId";
+                    break;
                 case 'events':
                     $sql = "DELETE FROM $selectedTable WHERE event_id = $selectedRecordId";
                     break;
@@ -158,7 +245,7 @@ $certifications = getAllRecords($conn, 'certifications');
 $programs = getAllRecords($conn, 'programs');
 $summercamps = getAllRecords($conn, 'summercamps');
 $courses = getAllRecords($conn, 'courses');
-
+$users = getAllRecords($conn, 'users');
 ?>
 
 <!DOCTYPE html>
@@ -171,21 +258,27 @@ $courses = getAllRecords($conn, 'courses');
 </head>
 
 <body>
-    <h2>Admin Page</h2>
+    <h1>Admin Page</h1>
     <section>
         <h3>Stats</h3>
-
         <ul>
             <?php
             // list of tables to get stats
             $tables = array(
                 "students",
-                "attendedevents",
                 "events",
+                "attendedevents",
+                "trainings",
                 "studenttrainings",
+                "certifications",
                 "studentcerts",
                 "programs",
                 "programenrollments",
+                "summercamps",
+                "internships",
+                "studentinternships",
+                "courses",
+                "takencourses",
                 "applications"
             );
 
@@ -198,11 +291,144 @@ $courses = getAllRecords($conn, 'courses');
                     "studentcerts" => "student certifications",
                     "programenrollments" => "program enrollments"
                 )[$table] ?? $table;
-                
+
                 echo "<li>Total number of $tableName: $rowCount</li>";
             }
             ?>
         </ul>
+
+        <h3>Reports</h3>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <label>Select Report:</label>
+            <select name="selected_report">
+                <option value="report_cldp_stus">Number of total Cyber Leader Development Program students</option>
+                <option value="report_viceroy_stus">Number of total VICEROY students</option>
+                <option value="report_pathways_stus">Number of total Pathways students</option>
+                <option value="report_cybercorps_stus">Number of total CyberCorps: Scholarship for Service students
+                </option>
+                <option value="report_dod_stus">Number of total DoD Cybersecurity Scholarship Program students</option>
+                <option value="report_complete_all">Number of students to complete all course and certification
+                    opportunities</option>
+                <option value="report_strat_foreign">Number of students electing to take additional strategic foreign
+                    language courses</option>
+                <option value="report_crypto">Number of students electing to take other cryptography and cryptographic
+                    mathematics courses</option>
+                <option value="report_data_sci">Number of students electing to carry additional data science and related
+                    courses</option>
+                <option value="report_enroll_dod_cour">Number of students to enroll in DoD 8570.01M preparation training
+                    courses</option>
+                <option value="report_complete_dod_cour">Number of students to complete DoD 8570.01M preparation
+                    training courses</option>
+                <option value="report_enroll_dod_exam">Number of students to complete a DoD 8570.01M certification
+                    examination</option>
+                <option value="report_minority">Minority participation</option>
+                <option value="report_k_12_sc">Number of K-12 students enrolled in summer camps</option>
+                <option value="report_fed_interns">Number of students pursuing federal internships</option>
+                <option value="report_majors">Student majors</option>
+                <option value="report_intern_locs">Student internship locations</option>
+            </select>
+            <button type="submit" name="generate_report">Generate</button>
+        </form>
+
+        <?php
+        // display generate report content
+        if (isset($reportData)) {
+            echo "<h4>Generated Report</h4>";
+            if (is_array($reportData)) {
+                echo "<table border='1'>";
+                echo "<tr>";
+                foreach ($reportData[0] as $column => $value) {
+                    $formattedColumnName = ucwords(str_replace('_', ' ', $column));
+                    echo "<th>{$formattedColumnName}</th>";
+                }
+                echo "</tr>";
+                foreach ($reportData as $row) {
+                    echo "<tr>";
+                    foreach ($row as $column => $value) {
+                        echo "<td>{$value}</td>";
+                    }
+                    echo "</tr>";
+                }
+                echo "</table>";
+            } else {
+                // if just one item show just the piece of data
+                echo "<p>{$reportData}</p>";
+            }
+        }
+        ?>
+
+    </section>
+    <hr />
+    <section>
+        <h3>Users</h3>
+        <table border="1">
+            <tr>
+                <th>User Id</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Middle Initial</th>
+                <th>Phone</th>
+                <th>Password</th>
+                <th>Is Admin</th>
+            </tr>
+
+            <?php
+            foreach ($users as $user) {
+                echo "<tr>";
+                echo "<td><span>{$user['user_id']}</span></td>";
+                echo "<td><span>{$user['email']}</span></td>";
+                echo "<td><span>{$user['f_name']}</span></td>";
+                echo "<td><span>{$user['l_name']}</span></td>";
+                echo "<td><span>{$user['m_initial']}</span></td>";
+                echo "<td><span>{$user['phone']}</span></td>";
+                echo "<td><span>{$user['password']}</span></td>";
+                echo "<td><span>" . ($user['is_admin'] ? 'Yes' : 'No') . "</span></td>";
+                echo "</tr>";
+            }
+            ?>
+
+        </table>
+
+        <br>
+        <h4>Modify User</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="users">
+
+            <label>Select User:</label>
+            <select name="selected_record_id">
+                <option value="add_new">Add new User</option>
+                <?php
+                foreach ($users as $user) {
+                    echo "<option value='{$user['user_id']}'>{$user['user_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <label>First Name:</label>
+            <input type="text" name="first_name"><br>
+            <label>First Name:</label>
+            <input type="text" name="last_name"><br>
+            <label>Middle Initial:</label>
+            <input type="text" name="m_initial"><br>
+            <label>Phone Number:</label>
+            <input type="text" name="phone"><br>
+            <label>Password:</label>
+            <input type="text" name="password"><br>
+            <label for="is_admin">Is Admin?</label>
+            <select name="is_admin" id="is_admin">
+                <option value=""></option>
+                <option value="1">Yes</option>
+                <option value="0">No</option>
+            </select>
+
+            <br>
+            <button type="submit" name="update_record">Update/Add</button>
+            <button type="submit" name="delete_record">Delete</button>
+        </form>
     </section>
     <hr />
     <section>
