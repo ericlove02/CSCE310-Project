@@ -243,7 +243,7 @@ $events = getAllRecords($conn, 'events');
 $trainings = getAllRecords($conn, 'trainings');
 $certifications = getAllRecords($conn, 'certifications');
 $programs = getAllRecords($conn, 'programs');
-$summercamps = getAllRecords($conn, 'summercamps');
+// $summercamps = getAllRecords($conn, 'summercamps');
 $courses = getAllRecords($conn, 'courses');
 $users = getAllRecords($conn, 'users');
 ?>
@@ -274,7 +274,7 @@ $users = getAllRecords($conn, 'users');
                 "studentcerts",
                 "programs",
                 "programenrollments",
-                "summercamps",
+                // "summercamps",
                 "internships",
                 "studentinternships",
                 "courses",

@@ -201,7 +201,11 @@ $internships = getAllRecords($conn, 'internships');
             $val = $row[$key] == 1 ? 'checked' : '';
             echo "${label}:   <input type='hidden' value='0' name='${key}'>    <input type=\"checkbox\" name=\"${key}\" value='1' {$val}><br>";
         }
-
+        ?>
+        <span>UIN:
+            <?php echo $id ?>
+        </span><br>
+        <?php
         createInput($row, "email", "Email");
         createInput($row, "f_name", "First Name");
         createInput($row, "l_name", "Last Name");
@@ -215,7 +219,7 @@ $internships = getAllRecords($conn, 'internships');
             die("<br><b>Not a student<b><br>");
 
         // student stuff
-        createInput($stu_row, "stu_uin", "UIN"); // new
+        // createInput($stu_row, "stu_uin", "UIN"); // new
         
         createInput($stu_row, "stu_gender", "Gender");
         createCheckbox($stu_row, "stu_hisp_latino", "Hispanic?");
