@@ -9,7 +9,7 @@ if (@$_POST['doChangeUser']) {
     $_SESSION['admin_id'] = $_SESSION['user_id'];
     // store the user id that they are checking out
     $_SESSION['user_id'] = $_POST['user_id'];
-    header("Location: ../student.php");
+    header("Location: ../student/info.php");
     return;
 }
 
