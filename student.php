@@ -593,7 +593,15 @@ WHERE programs.prog_id NOT IN(
             </select>
             <br>
             <label>Internship Id:</label>
-            <input type="text" name="new_intshp"><br>
+            <select name="new_intshp">
+                <?php
+                foreach ($internships as $internship) {
+                    echo "<option value=\"{$internship['intshp_id']}\">";
+                    echo "{$internship['intshp_id']} - {$internship['intshp_name']}";
+                    echo "</option>";
+                }
+                ?>
+            </select><br>
             <label>Application Status:</label>
             <input type="text" name="app_status"><br>
 
