@@ -1,6 +1,6 @@
 <?php
 require '../utils/connect.php';
-session_start();
+require '../utils/middleware.php';
 
 $id = $_SESSION['user_id'];
 

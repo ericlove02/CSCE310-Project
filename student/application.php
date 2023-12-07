@@ -13,14 +13,7 @@ function fetch_application($user_id, $prog_id)
     return $application;
 }
 
-session_start();
-
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo "You must log in first";
-    exit;
-}
-
+require '../utils/middleware.php';
 require '../utils/connect.php';
 
 // check if post request was made
