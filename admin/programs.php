@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/notification.php";
 
 
 // select all entities from a table
@@ -22,6 +23,8 @@ function getAllRecords($conn, $tableName)
 function updateRecord($conn, $tableName, $recordId, $recordData)
 {
     $updateValues = '';
+    $id_key = '';
+
     // parse value pairs
     foreach ($recordData as $column => $value) {
         if (strpos($column, '_id') !== false) {
@@ -32,13 +35,14 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
             $updateValues .= "$column = '$value', ";
         }
     }
+
     $updateValues = rtrim($updateValues, ', ');
 
     $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
     if ($conn->query($sql) !== TRUE) {
-        echo "Error updating record: " . $conn->error;
+        makeToast("Error updating record: " . $conn->error, false);
     } else {
-        echo "Entry in $tableName updated";
+        makeToast("Program '$value' updated", true);
     }
 }
 
@@ -54,9 +58,9 @@ function addRecord($conn, $tableName, $recordData)
     $values = "'" . implode("', '", array_values($recordData)) . "'";
     $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
     if ($conn->query($sql) !== TRUE) {
-        echo "Error adding new record: " . $conn->error;
-    } else {
-        echo "New entry to $tableName added";
+        makeToast("Error adding new record: " . $conn->error, false);
+    } else { 
+        makeToast("New program added", true);
     }
 }
 
@@ -69,45 +73,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // handle data based on which table was selected
         switch ($_POST['selected_table']) {
-            case 'users':
-                $recordData['user_id'] = $_POST['selected_record_id'];
-                $recordData['f_name'] = $_POST['first_name'];
-                $recordData['l_name'] = $_POST['last_name'];
-                $recordData['m_initial'] = $_POST['m_initial'];
-                $recordData['phone'] = $_POST['phone'];
-                $recordData['password'] = $_POST['password'];
-                $recordData['is_admin'] = $_POST['is_admin'];
-                break;
-            case 'events':
-                $recordData['event_id'] = $_POST['selected_record_id'];
-                $recordData['event_name'] = $_POST['record_name'];
-                $recordData['event_location'] = $_POST['record_loc'];
-                break;
-            case 'trainings':
-                $recordData['train_id'] = $_POST['selected_record_id'];
-                $recordData['train_name'] = $_POST['record_name'];
-                break;
-            case 'certifications':
-                $recordData['cert_id'] = $_POST['selected_record_id'];
-                $recordData['cert_name'] = $_POST['record_name'];
-                break;
             case 'programs':
                 $recordData['prog_id'] = $_POST['selected_record_id'];
                 $recordData['prog_name'] = $_POST['record_name'];
                 break;
-            case 'courses':
-                $recordData['cour_id'] = $_POST['selected_record_id'];
-                $recordData['cour_name'] = $_POST['record_name'];
-                break;
-
-            case 'summercamps':
-                $recordData['camp_id'] = $_POST['selected_record_id'];
-                $recordData['sc_name'] = $_POST['record_name'];
-                $recordData['sc_year'] = $_POST['record_year'];
-                break;
             default:
                 // default case
-                echo "Invalid table selected";
+                makeToast("Invalid table selected", false);
                 break;
         }
 
@@ -123,39 +95,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedTable = $_POST['selected_table'];
         if ($selectedRecordId == 'add_new') {
             // show an alert when trying to delete 'add new'
-            echo '<script>alert("Error: Cannot delete a new record.");</script>';
+            makeToast("Error: Cannot delete a new record.", false);
         } else {
             switch ($_POST['selected_table']) {
-                case 'users':
-                    $sql = "DELETE FROM $selectedTable WHERE user_id = $selectedRecordId";
-                    break;
-                case 'events':
-                    $sql = "DELETE FROM $selectedTable WHERE event_id = $selectedRecordId";
-                    break;
-                case 'trainings':
-                    $sql = "DELETE FROM $selectedTable WHERE train_id = $selectedRecordId";
-                    break;
-                case 'certifications':
-                    $sql = "DELETE FROM $selectedTable WHERE cert_id = $selectedRecordId";
-                    break;
                 case 'programs':
                     $sql = "DELETE FROM $selectedTable WHERE prog_id = $selectedRecordId";
                     break;
-                case 'courses':
-                    $sql = "DELETE FROM $selectedTable WHERE cour_id = $selectedRecordId";
-                    break;
-                case 'summercamps':
-                    $sql = "DELETE FROM $selectedTable WHERE camp_id = $selectedRecordId";
-                    break;
                 default:
                     // default case
-                    echo "Invalid table selected";
+                    makeToast("Invalid table selected", false);
                     break;
             }
             if ($conn->query($sql) !== TRUE) {
-                echo "Error deleting record: " . $conn->error;
+                makeToast("Error deleting record: " . $conn->error, false);
             } else {
-                echo "$selectedTable record deleted";
+                makeToast("Program successfully deleted", true);
             }
         }
     }
@@ -213,6 +167,7 @@ $programs = getAllRecords($conn, 'programs');
             </div>
         </div>
     </nav>
+    <div id="noti"></div>
     <section>
         <h3>Program Information Management</h3>
         <table border="1">
