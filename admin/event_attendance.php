@@ -1,5 +1,6 @@
 <?php
 require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 function get_attendance($event_id, $user_id)
 {

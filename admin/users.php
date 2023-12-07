@@ -1,5 +1,6 @@
 <?php
 require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 // switch to new account from users button press
 if (@$_POST['doChangeUser']) {

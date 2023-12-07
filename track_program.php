@@ -1,5 +1,6 @@
 <?php
 require_once "utils/connect.php";
+require_once "utils/middleware.php";
 
 session_start();
 

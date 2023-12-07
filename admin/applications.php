@@ -1,5 +1,6 @@
 <?php
 require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {

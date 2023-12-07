@@ -1,5 +1,6 @@
 <?php
 require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 
 // select all entities from a table
