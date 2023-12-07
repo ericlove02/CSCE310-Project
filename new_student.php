@@ -1,10 +1,7 @@
 <?php
-
 require_once "utils/connect.php";
 
 session_start();
-
-
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"]; // Email
@@ -77,7 +74,6 @@ $conn->close();
 
 function checkboxToInt($val)
 {
-    //$val_type = gettype($val);
     if (is_null($val)) {
         return 0;
     } else {
@@ -85,28 +81,23 @@ function checkboxToInt($val)
     }
 }
 
-
 // UI generators
 function createInput($key, $label, $bootstrapClass = "")
 {
-    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\"></div>";
 }
 function createDefaultInput($key, $label, $default, $bootstrapClass = "")
 {
-    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\" value=\"${default}\"></div>";
 }
 
 function createCheckbox($key, $label)
 {
-    // echo "<label for=\"$key\">${label}</label><br> <input type=\"checkbox\" name=\"${key}\"><br>";
     echo "${label}: <input type=\"checkbox\" name=\"${key}\"><br>";
 }
 
 function createDate($key, $label, $bootstrapClass = null)
 {
-    // echo "<label for=\"$key\">${label}</label><br> <input type=\"text\" name=\"${key}\"><br>";
     echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"date\" class=\"form-control\" name=\"${key}\"></div>";
 }
 
@@ -118,7 +109,6 @@ function createSelection($key, $label, $assoc_name_value)
     }
     echo "</select><br>";
 }
-
 ?>
 
 <!DOCTYPE html>
@@ -156,7 +146,6 @@ function createSelection($key, $label, $assoc_name_value)
         left: 10px;
     }
 </style>
-
 
 <body>
     <a href="index.php" class="btn btn-dark back-button">Back to Login</a>
@@ -220,11 +209,8 @@ function createSelection($key, $label, $assoc_name_value)
             createCheckbox("stu_in_cyber_club", "In Cybersecurity Club?"); // new
             createCheckbox("stu_in_women_cyber", "In Women in Cybersecurity?"); // new
             
-
-
             // new fields
             ?>
-
 
             <input type="submit" class="btn btn-dark">
         </form>

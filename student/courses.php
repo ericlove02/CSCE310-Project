@@ -2,6 +2,7 @@
 require '../utils/connect.php';
 require '../utils/middleware.php';
 require "../utils/notification.php";
+require "../utils/helpers.php";
 
 $id = $_SESSION['user_id'];
 
@@ -10,84 +11,6 @@ $result = $conn->query($sql);
 $row = $result->fetch_assoc();
 
 $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_assoc();
-
-function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_on = null)
-{
-    if ($join_table && $join_on) {
-        $sql = "SELECT * FROM $tableName
-                JOIN $join_table ON $tableName.$join_on = $join_table.$join_on
-                WHERE $tableName.user_id = '$id'";
-    } elseif ($id) {
-        $sql = "SELECT * FROM $tableName WHERE user_id = '$id'";
-    } else {
-        $sql = "SELECT * FROM $tableName";
-    }
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
-    $updateValues = '';
-    $keyValues = '';
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
-            $keyValues .= "$column = '$value' AND ";
-        } elseif ($value != '') {
-            $column = fixJoinTableVariables($column);
-            $updateValues .= "$column = '$value', ";
-        }
-    }
-    $updateValues = rtrim($updateValues, ', ');
-    $keyValues = rtrim($keyValues, 'AND ');
-
-    $sql = "UPDATE $tableName SET $updateValues WHERE $keyValues";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error updating record: " . $conn->error, false);
-    } else {
-        makeToast("Entry in $tableName updated", true);
-    }
-}
-
-function addRecord($conn, $tableName, $recordData)
-{
-    $fixedRecordData = array();
-    foreach ($recordData as $columnName => $value) {
-        $fixedColumnName = fixJoinTableVariables($columnName);
-        $fixedRecordData[$fixedColumnName] = $value;
-    }
-    $columns = implode(', ', array_keys($fixedRecordData));
-    $filteredValues = array_filter(array_values($recordData), function ($value) {
-        return $value !== "add_new";
-    });
-
-    $values = "'" . implode("', '", $filteredValues) . "'";
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error adding new record: " . $conn->error, false);
-    } else {
-        makeToast("New entry to $tableName added", true);
-    }
-}
-
-function fixJoinTableVariables($columnName)
-{
-    // jank fix for joined tables
-    if ($columnName == "new_cour") {
-        return "cour_id";
-    } elseif ($columnName == "new_intshp") {
-        return "intshp_id";
-    } else {
-        return $columnName;
-    }
-}
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (isset($_POST['update_record'])) {
@@ -238,6 +161,7 @@ $courses = getAllRecords($conn, 'courses');
         <table border="1">
             <tr>
                 <th>Course Id</th>
+                <th>Course Name</th>
                 <th>Semester</th>
                 <th>Is Passed?</th>
             </tr>
@@ -246,6 +170,7 @@ $courses = getAllRecords($conn, 'courses');
             foreach ($takencourses as $takencourse) {
                 echo "<tr>";
                 echo "<td><span>{$takencourse['cour_id']}</span></td>";
+                echo "<td><span>{$takencourse['cour_name']}</span></td>";
                 echo "<td><span>{$takencourse['tc_semester']}</span></td>";
                 echo "<td><span>" . ($takencourse['tc_is_passed'] ? 'Yes' : 'No') . "</span></td>";
                 echo "</tr>";

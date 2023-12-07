@@ -3,8 +3,6 @@ session_start();
 
 require 'connect.php';
 
-
-
 $id = $_SESSION['user_id'];
 
 if (@$_POST['submit'] == 'Deactivate account') {
@@ -20,8 +18,6 @@ if (@$_POST['submit'] == 'Deactivate account') {
 
     return;
 }
-
-
 
 $userkeys = array('user_id' => true, 'email' => true, 'f_name' => true, 'l_name' => true, 'm_initial' => true, 'phone' => true, 'password' => true, 'is_admin' => true);
 
@@ -53,8 +49,6 @@ if ($conn->execute_query($sql, $userValues) === TRUE && $conn->execute_query($sq
 } else {
     echo "Error updating record: " . $conn->error;
 }
-
-
 
 $conn->close();
 ?>

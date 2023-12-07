@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/helpers.php";
 
 // get count of rows from table name
 function getTableRowCount($conn, $tableName)
@@ -12,21 +13,6 @@ function getTableRowCount($conn, $tableName)
     }
     $row = $result->fetch_assoc();
     return $row['count'];
-}
-
-// select all entities from a table
-function getAllRecords($conn, $tableName)
-{
-    $sql = "SELECT * FROM $tableName";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
 }
 
 function generateProgramReport($conn, $prog_id)

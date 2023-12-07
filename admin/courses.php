@@ -1,69 +1,8 @@
 <?php
-
-use function PHPSTORM_META\map;
-
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
 require "../utils/notification.php";
-
-// select all entities from a table
-function getAllRecords($conn, $tableName)
-{
-    $sql = "SELECT * FROM $tableName";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
-// update a table given the table name and a dict of values
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
-    $updateValues = '';
-    $id_key = '';
-
-    // parse value pairs
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
-            $id_key = $column;
-            continue;
-        }
-        if ($value != '') {
-            $updateValues .= "$column = '$value', ";
-        }
-    }
-    $updateValues = rtrim($updateValues, ', ');
-
-    $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error updating record: " . $conn->error, false);
-    } else {
-        makeToast("Course '$value' updated", true);
-    }
-}
-
-// insert into given table name with dict of values
-function addRecord($conn, $tableName, $recordData)
-{
-    foreach ($recordData as $key => $value) {
-        if ($value == "add_new") {
-            unset($recordData[$key]);
-        }
-    }
-    $columns = implode(', ', array_keys($recordData));
-    $values = "'" . implode("', '", array_values($recordData)) . "'";
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error adding new record: " . $conn->error, false);
-    } else {
-        makeToast("New course added", true);
-    }
-}
+require "../utils/helpers.php";
 
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
