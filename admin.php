@@ -1,6 +1,13 @@
 <?php
 require_once "utils/connect.php";
 
+if (@$_POST['doChangeUser']) {
+    session_start();
+    $_SESSION['user_id'] = $_POST['user_id'];
+    header("Location: student.php");
+    return;
+}
+
 function getTableRowCount($conn, $tableName)
 {
     $sql = "SELECT COUNT(*) AS count FROM $tableName";
@@ -129,6 +136,69 @@ function generateReport($conn, $selectedReport)
                         p.prog_name = 'DoD Cybersecurity Scholarship'";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_complete_all':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students
+                    FROM
+                        students s
+                    WHERE
+                        (SELECT COUNT(*) FROM takencourses tc WHERE tc.user_id = s.user_id) = (SELECT COUNT(*) FROM courses)
+                        AND
+                        (SELECT COUNT(*) FROM studentcerts sc WHERE sc.user_id = s.user_id) = (SELECT COUNT(*) FROM certifications)";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        //NOTE: NEED to add a race col for students
+        case 'report_minority':
+            $sql = "SELECT
+                COUNT(DISTINCT s.user_id) AS students
+            FROM
+                students s
+            JOIN
+                studentraces sr ON s.user_id = sr.user_id
+            JOIN
+                races r ON sr.race_id = r.race_id
+            WHERE
+                r.race_name != 'White'";
+        $result = $conn->query($sql);
+        return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_fed_interns':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students
+                    FROM
+                        students s
+                    JOIN
+                        studentinternships si ON s.user_id = si.user_id
+                    JOIN
+                        internships i ON si.intshp_id = i.intshp_id
+                    WHERE
+                        i.intshp_is_federal = '1'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_majors':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students,
+                        s.stu_major
+                    FROM
+                        students s
+                    GROUP BY
+                        s.stu_major";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_intern_locs':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students,
+                        i.intshp_state,
+                        i.intshp_year
+                    FROM
+                        students s
+                    JOIN
+                        studentinternships si ON s.user_id = si.user_id
+                    JOIN
+                        internships i ON si.intshp_id = i.intshp_id
+                    GROUP BY
+                        i.intshp_state, i.intshp_year";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         default:
             return "Invalid report selected";
     }
@@ -136,6 +206,43 @@ function generateReport($conn, $selectedReport)
 
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    if (isset($_POST['update_app'])) {
+        $selectedRecordId = $_POST['selected_record_id'];
+        $isApproved = $_POST['is_approved'];
+
+        // get application details based on app_id
+        $sqlSelect = "SELECT * FROM applications WHERE app_id = $selectedRecordId";
+        $resultSelect = $conn->query($sqlSelect);
+
+        if ($resultSelect) {
+            $applicationDetails = $resultSelect->fetch_assoc();
+
+            if ($isApproved) {
+                // insert into programenrollments
+                $user_id = $applicationDetails['user_id'];
+                $prog_id = $applicationDetails['prog_id'];
+
+                $sqlInsert = "INSERT INTO programenrollments (user_id, prog_id) VALUES ($user_id, $prog_id)";
+                $resultInsert = $conn->query($sqlInsert);
+
+                if (!$resultInsert) {
+                    die("Insert into programenrollments failed: " . $conn->error);
+                }
+            }
+
+            // delete the applciations either way
+            $sqlDelete = "DELETE FROM applications WHERE app_id = $selectedRecordId";
+            $resultDelete = $conn->query($sqlDelete);
+
+            if (!$resultDelete) {
+                die("Delete from applications failed: " . $conn->error);
+            }
+
+            echo "Application updated successfully.";
+        } else {
+            die("Select application details failed: " . $conn->error);
+        }
+    }
     if (isset($_POST['generate_report'])) {
         $selectedReport = $_POST['selected_report'];
         $reportData = generateReport($conn, $selectedReport);
@@ -246,6 +353,13 @@ $programs = getAllRecords($conn, 'programs');
 // $summercamps = getAllRecords($conn, 'summercamps');
 $courses = getAllRecords($conn, 'courses');
 $users = getAllRecords($conn, 'users');
+
+$sql = "SELECT applications.*, users.*, programs.* 
+            FROM applications 
+            JOIN users ON applications.user_id = users.user_id 
+            JOIN programs ON applications.prog_id = programs.prog_id";
+$result = $conn->query($sql);
+$applications = $result->fetch_all(MYSQLI_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -290,7 +404,9 @@ $users = getAllRecords($conn, 'users');
                     "attendedevents" => "attended events",
                     "studenttrainings" => "student trainings",
                     "studentcerts" => "student certifications",
-                    "programenrollments" => "program enrollments"
+                    "programenrollments" => "program enrollments",
+                    "takencourses" => "taken courses",
+                    "studentinternships" => "student internships"
                 )[$table] ?? $table;
 
                 echo "<li>Total number of $tableName: $rowCount</li>";
@@ -336,7 +452,9 @@ $users = getAllRecords($conn, 'users');
         // display generate report content
         if (isset($reportData)) {
             echo "<h4>Generated Report</h4>";
-            if (is_array($reportData)) {
+            if ($reportData == null) {
+                echo "<p>No data to display</p>";
+            } elseif (is_array($reportData)) {
                 echo "<table border='1'>";
                 echo "<tr>";
                 foreach ($reportData[0] as $column => $value) {
@@ -373,15 +491,10 @@ $users = getAllRecords($conn, 'users');
                 <th>Phone</th>
                 <th>Password</th>
                 <th>Is Admin</th>
+                <th></th>
             </tr>
 
             <?php
-            if (@$_POST['doChangeUser']) {
-                session_start();
-                $_SESSION['user_id'] = $_POST['user_id'];
-                header("Location: student.php");
-                return;
-            }
 
             foreach ($users as $user) {
                 echo "<tr>";
@@ -411,7 +524,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new User</option>
                 <?php
                 foreach ($users as $user) {
-                    echo "<option value='{$user['user_id']}'>{$user['user_id']}</option>";
+                    echo "<option value='{$user['user_id']}'>{$user['user_id']} - {$user['email']}</option>";
                 }
                 ?>
             </select>
@@ -470,7 +583,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new Program</option>
                 <?php
                 foreach ($programs as $program) {
-                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']}</option>";
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']} - {$program['prog_name']}</option>";
                 }
                 ?>
             </select>
@@ -492,6 +605,7 @@ $users = getAllRecords($conn, 'users');
                 <th>Event Id</th>
                 <th>Event Name</th>
                 <th>Event Location</th>
+                <th></th>
             </tr>
 
             <?php
@@ -500,6 +614,7 @@ $users = getAllRecords($conn, 'users');
                 echo "<td><span>{$event['event_id']}</span></td>";
                 echo "<td><span>{$event['event_name']}</span></td>";
                 echo "<td><span>{$event['event_location']}</span></td>";
+                echo "<td><a href='event_attendance.php?id={$event['event_id']}'><button class='btn btn-dark'>Edit attendance</button></a></td>";
                 echo "</tr>";
             }
             ?>
@@ -517,7 +632,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new Event</option>
                 <?php
                 foreach ($events as $event) {
-                    echo "<option value='{$event['event_id']}'>{$event['event_id']}</option>";
+                    echo "<option value='{$event['event_id']}'>{$event['event_id']} - {$event['event_name']}</option>";
                 }
                 ?>
             </select>
@@ -531,6 +646,61 @@ $users = getAllRecords($conn, 'users');
             <br>
             <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
             <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
+        </form>
+    </section>
+    <hr />
+    <section>
+        <h3>Review Applications</h3>
+        <table border="1">
+            <tr>
+                <th>Application Id</th>
+                <th>User First Name</th>
+                <th>User Last Name</th>
+                <th>Program Name</th>
+                <th>Purpose Statement</th>
+                <th>Uncompleted Certifications</th>
+                <th>Completed Certifications</th>
+            </tr>
+
+            <?php
+            foreach ($applications as $application) {
+                echo "<tr>";
+                echo "<td><span>{$application['app_id']}</span></td>";
+                echo "<td><span>{$application['f_name']}</span></td>";
+                echo "<td><span>{$application['l_name']}</span></td>";
+                echo "<td><span>{$application['prog_name']}</span></td>";
+                echo "<td><span>{$application['app_purpose_statement']}</span></td>";
+                echo "<td><span>{$application['uncom_cert']}</span></td>";
+                echo "<td><span>{$application['com_cert']}</span></td>";
+                echo "</tr>";
+            }
+            ?>
+        </table>
+
+        <br>
+        <h4>Modify Application</h4>
+
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <input type="hidden" name="selected_table" value="applications">
+
+            <label>Select Application:</label>
+            <select name="selected_record_id">
+                <?php
+                foreach ($applications as $application) {
+                    echo "<option value='{$application['app_id']}'>{$application['app_id']}</option>";
+                }
+                ?>
+            </select>
+            <br>
+
+            <select name="is_approved" id="is_approved">
+                <option value=""></option>
+                <option value="1">Approve</option>
+                <option value="0">Deny</option>
+            </select>
+
+            <br>
+            <button type="submit" name="update_app" class="btn btn-dark">Update Application</button>
         </form>
     </section>
     <hr />
@@ -564,7 +734,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new Training</option>
                 <?php
                 foreach ($trainings as $training) {
-                    echo "<option value='{$training['train_id']}'>{$training['train_id']}</option>";
+                    echo "<option value='{$training['train_id']}'>{$training['train_id']} - {$training['train_name']}</option>";
                 }
                 ?>
             </select>
@@ -609,7 +779,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new Certification</option>
                 <?php
                 foreach ($certifications as $certification) {
-                    echo "<option value='{$certification['cert_id']}'>{$certification['cert_id']}</option>";
+                    echo "<option value='{$certification['cert_id']}'>{$certification['cert_id']} - {$certification['cert_name']}</option>";
                 }
                 ?>
             </select>
@@ -703,7 +873,7 @@ $users = getAllRecords($conn, 'users');
                 <option value="add_new">Add new Course</option>
                 <?php
                 foreach ($courses as $course) {
-                    echo "<option value='{$course['cour_id']}'>{$course['cour_id']}</option>";
+                    echo "<option value='{$course['cour_id']}'>{$course['cour_id']} - {$course['cour_name']}</option>";
                 }
                 ?>
             </select>
