@@ -98,7 +98,7 @@ $conn->close();
     </head>
 
     <body>
-        <button class="btn btn-dark"><a href="/program_dir.php" class="text-decoration-none text-white"> Go Back </a></button>
+        <button class="btn btn-dark" onclick='history.back()'>Go Back</button>
         <h1>Your Application for <?php echo $program['prog_name']?></h1>
         <form method="POST" action="application.php">
             <input type="hidden" name="req_type" value="PUT">
