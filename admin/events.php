@@ -167,9 +167,9 @@ $programs = getAllRecords($conn, 'programs');
                 ?>
             </select>
 
-            <br>
+            <br><br>
             <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
-            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
+            <button type="submit" name="delete_record" class="btn btn-danger">Delete</button>
         </form>
     </section>
     <?php
