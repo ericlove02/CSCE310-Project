@@ -202,6 +202,33 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
                 </div>
             </form>
         </section>
+        <br>
+        <section>
+            <h4>Events for <?php echo $prog_name ?></h4>
+            <?php
+            // Fetch attended events
+            $sqlAttendedEvents = "SELECT * FROM events e JOIN attendedevents ae ON e.event_id = ae.event_id WHERE ae.user_id = $userId AND e.prog_id = $prog_id";
+            $resultAttendedEvents = $conn->query($sqlAttendedEvents);
+            $attendedEvents = $resultAttendedEvents->fetch_all(MYSQLI_ASSOC);
+            ?>
+            <!-- Display attended events in a table -->
+            <table>
+                <tr>
+                    <th>Event Name</th>
+                    <th>Program ID</th>
+                    <th>Event ID</th>
+                    <th>Event Location</th>
+                </tr>
+                <?php foreach ($attendedEvents as $event) { ?>
+                    <tr>
+                        <td><?php echo $event['event_name']; ?></td>
+                        <td><?php echo $event['prog_id']; ?></td>
+                        <td><?php echo $event['event_id']; ?></td>
+                        <td><?php echo $event['event_location']; ?></td>
+                    </tr>
+                <?php } ?>
+            </table>
+        </section>
     </div>
 </body>
 
