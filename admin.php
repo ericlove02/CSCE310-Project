@@ -129,6 +129,64 @@ function generateReport($conn, $selectedReport)
                         p.prog_name = 'DoD Cybersecurity Scholarship'";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_complete_all':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students
+                    FROM
+                        students s
+                    WHERE
+                        (SELECT COUNT(*) FROM takencourses tc WHERE tc.user_id = s.user_id) = (SELECT COUNT(*) FROM courses)
+                        AND
+                        (SELECT COUNT(*) FROM studentcerts sc WHERE sc.user_id = s.user_id) = (SELECT COUNT(*) FROM certifications)";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        //NOTE: NEED to add a race col for students
+        case 'report_minority':
+            $sql = "SELECT
+                COUNT(DISTINCT s.user_id) AS students
+            FROM
+                students s
+            WHERE
+                s.stu_hisp_latino = 1";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_fed_interns':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students
+                    FROM
+                        students s
+                    JOIN
+                        studentinternships si ON s.user_id = si.user_id
+                    JOIN
+                        internships i ON si.intshp_id = i.intshp_id
+                    WHERE
+                        i.intshp_is_federal = '1'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_majors':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students,
+                        s.stu_major
+                    FROM
+                        students s
+                    GROUP BY
+                        s.stu_major";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
+        case 'report_intern_locs':
+            $sql = "SELECT
+                        COUNT(DISTINCT s.user_id) AS students,
+                        i.intshp_state
+                    FROM
+                        students s
+                    JOIN
+                        studentinternships si ON s.user_id = si.user_id
+                    JOIN
+                        internships i ON si.intshp_id = i.intshp_id
+                    GROUP BY
+                        i.intshp_state";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         default:
             return "Invalid report selected";
     }
@@ -336,7 +394,9 @@ $users = getAllRecords($conn, 'users');
         // display generate report content
         if (isset($reportData)) {
             echo "<h4>Generated Report</h4>";
-            if (is_array($reportData)) {
+            if($reportData == null){
+                echo "<p>No data to display</p>";
+            } elseif (is_array($reportData)) {
                 echo "<table border='1'>";
                 echo "<tr>";
                 foreach ($reportData[0] as $column => $value) {
