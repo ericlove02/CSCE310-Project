@@ -18,67 +18,58 @@ function generateReport($conn, $selectedReport)
 {
     switch ($selectedReport) {
         case 'report_cldp_stus':
-            $sql = "SELECT
-                        COUNT(DISTINCT s.user_id) AS enrolled_students,
-                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
-                    FROM
-                        students s
-                    JOIN
-                        programenrollments pe ON s.user_id = pe.user_id
-                    JOIN
-                        programs p ON pe.prog_id = p.prog_id
-                    WHERE
-                        p.prog_name = 'CLDP'";
+            $sql = "SELECT 
+                COUNT(DISTINCT pe.user_id) AS enrolled_students
+                FROM 
+                    programenrollments pe
+                JOIN 
+                    programs p ON pe.prog_id = p.prog_id
+                WHERE 
+                    p.prog_name = 'CLDP'";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_viceroy_stus':
-            $sql = "SELECT
-                        COUNT(DISTINCT s.user_id) AS enrolled_students,
-                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
-                    FROM
-                        students s
-                    JOIN
-                        programenrollments pe ON s.user_id = pe.user_id
-                    JOIN
-                        programs p ON pe.prog_id = p.prog_id
-                    WHERE
-                        p.prog_name = 'VICEROY'";
+            $sql = "SELECT 
+                COUNT(DISTINCT pe.user_id) AS enrolled_students
+                FROM 
+                    programenrollments pe
+                JOIN 
+                    programs p ON pe.prog_id = p.prog_id
+                WHERE 
+                    p.prog_name = 'VICEROY'";    
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_pathways_stus':
-            $sql = "SELECT
-                        COUNT(DISTINCT s.user_id) AS enrolled_students,
-                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
-                    FROM
-                        students s
-                    JOIN
-                        programenrollments pe ON s.user_id = pe.user_id
-                    JOIN
-                        programs p ON pe.prog_id = p.prog_id
-                    WHERE
-                        p.prog_name = 'Pathways'";
+            $sql = "SELECT 
+                COUNT(DISTINCT pe.user_id) AS enrolled_students
+                FROM 
+                    programenrollments pe
+                JOIN 
+                    programs p ON pe.prog_id = p.prog_id
+                WHERE 
+                    p.prog_name = 'Pathways'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_cybercorps_stus':
-            $sql = "SELECT
-                        COUNT(DISTINCT s.user_id) AS enrolled_students,
-                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
-                    FROM
-                        students s
-                    JOIN
-                        programenrollments pe ON s.user_id = pe.user_id
-                    JOIN
-                        programs p ON pe.prog_id = p.prog_id
-                    WHERE
-                        p.prog_name = 'CyberCorps: Scholarship for Service'";
+            $sql = "SELECT 
+                COUNT(DISTINCT pe.user_id) AS enrolled_students
+                FROM 
+                    programenrollments pe
+                JOIN 
+                    programs p ON pe.prog_id = p.prog_id
+                WHERE 
+                    p.prog_name = 'CyberCorps: Scholarship for Service'";
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_dod_stus':
-            $sql = "SELECT
-                        COUNT(DISTINCT s.user_id) AS enrolled_students,
-                        COUNT(DISTINCT CASE WHEN pe.pe_enroll_pending = true THEN s.user_id END) AS pending_enrollments
-                    FROM
-                        students s
-                    JOIN
-                        programenrollments pe ON s.user_id = pe.user_id
-                    JOIN
-                        programs p ON pe.prog_id = p.prog_id
-                    WHERE
-                        p.prog_name = 'DoD Cybersecurity Scholarship'";
+            $sql = "SELECT 
+                COUNT(DISTINCT pe.user_id) AS enrolled_students
+                FROM 
+                    programenrollments pe
+                JOIN 
+                    programs p ON pe.prog_id = p.prog_id
+                WHERE 
+                    p.prog_name = 'DoD Cybersecurity Scholarship'";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_complete_all':
