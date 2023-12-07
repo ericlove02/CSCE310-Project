@@ -1,5 +1,6 @@
 <?php
-require_once "utils/connect.php";
+require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 function get_attendance($event_id, $user_id)
 {
@@ -59,8 +60,8 @@ if ($UIN_list != '') {
     </style>
 </head>
 
-<body>
-    <a href="admin.php" class="btn btn-dark">Back to Admin Page</a>
+<body style="padding:1em">
+    <a href="events.php" class="btn btn-dark">Back to Admin Page</a>
     <div class="container center-box">
         <h1 class="text-center">
             <?php echo $event_data['event_name']; ?>

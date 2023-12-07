@@ -20,7 +20,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // redirect to correct page
         if ($row['is_admin'] == 1) {
-            header("Location: admin.php");
+            header("Location: admin/applications.php");
         } else {
             if (isset($_SESSION['admin_id']))
                 unset($_SESSION['admin_id']);
