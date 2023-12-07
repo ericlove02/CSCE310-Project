@@ -1,7 +1,8 @@
 <?php
-function access_denied() {
+function access_denied()
+{
     echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">';
-    
+
     echo '
     <div class="d-flex align-items-center justify-content-center" style="height: 100vh;">
         <div>
@@ -22,8 +23,9 @@ if (!isset($_SESSION['user_id'])) {
 
 $current_url = $_SERVER['REQUEST_URI'];
 if (strpos($current_url, 'admin/') !== false) {
-    if (isset($_SESSION['admin_id'])) {
-        return;
+    if (!isset($_SESSION['admin_id'])) {
+        access_denied();
+        exit;
     }
 }
 ?>
