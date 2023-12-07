@@ -4,6 +4,17 @@ require_once "../utils/middleware.php";
 require "../utils/notification.php";
 require "../utils/helpers.php";
 
+// switch to new account from users button press
+if (@$_POST['doChangeUser']) {
+    session_start();
+    // store the admins id so they can return
+    $_SESSION['admin_id'] = $_SESSION['user_id'];
+    // store the user id that they are checking out
+    $_SESSION['user_id'] = $_POST['user_id'];
+    header("Location: ../student/info.php");
+    return;
+}
+
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // if posted to update a record
