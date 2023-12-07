@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/notification.php";
 
 function get_attendance($event_id, $user_id)
 {
@@ -13,8 +14,13 @@ function add_attendance($event_id, $user_id)
     global $conn;
     if (!get_attendance($event_id, $user_id)) {
         $result = $conn->execute_query('INSERT INTO attendedevents (event_id, user_id) VALUES (?, ?)', [$event_id, $user_id]);
+        if (!$result) {
+            makeToast("Error adding attendance: " . $conn->error, false);
+        } else {
+            makeToast("User $user_id added to event.", true);
+        }
     } else {
-        echo "User $user_id is already attending the event.";
+        makeToast("User $user_id is already attending the event.", false);
     }
 }
 
