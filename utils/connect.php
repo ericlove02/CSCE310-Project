@@ -15,10 +15,12 @@ if ($conn->connect_error) {
 // echo "Connected successfully";
 
 ?>
-<style> /* Cool hack to pad every page */
+<style>
+    /* Cool hack to pad every page */
     body {
         padding: 1em;
     }
+
     table {
         width: 100%;
         border-collapse: collapse;
@@ -31,7 +33,7 @@ if ($conn->connect_error) {
     }
 
     th {
-        background-color: #500000;
+        background-color: #500000 !important;
         color: white;
     }
 </style>
