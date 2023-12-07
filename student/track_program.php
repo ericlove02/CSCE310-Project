@@ -1,5 +1,5 @@
 <?php
-require_once "utils/connect.php";
+require_once "../utils/connect.php";
 
 session_start();
 
@@ -103,7 +103,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body>
-    <a href="student.php" class="btn btn-dark">Back to Student</a>
+    <a href="programs.php" class="btn btn-dark">Back to Student</a>
     <h1>
         Your
         <?php echo $prog_name ?> Status
