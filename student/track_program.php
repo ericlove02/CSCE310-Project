@@ -99,7 +99,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <span class="navbar-brand">Student Page</span>
+            <span class="navbar-brand">User Page</span>
 
             <!-- Navbar links -->
             <div class="collapse navbar-collapse" id="navbarNav">
