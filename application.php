@@ -64,8 +64,6 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "DELETE")
 }
 
 else if ($_SERVER["REQUEST_METHOD"] == "GET") {
-    echo "WHY ARE WE HERE";
-
     // get user
     $id = $_SESSION['user_id'];
     $sql = "SELECT * FROM users WHERE user_id = '$id'";
@@ -96,40 +94,36 @@ $conn->close();
 <html>
     <head>
         <title>Program Application</title>
+        <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
     </head>
 
     <body>
-        <button><a href="/program_dir.php"> Go Back </a></button>
-        <h1>Applications for <?php echo $program['prog_name']?></h1>
+        <button class="btn btn-dark"><a href="/program_dir.php" class="text-decoration-none text-white"> Go Back </a></button>
+        <h1>Your Application for <?php echo $program['prog_name']?></h1>
         <form method="POST" action="application.php">
             <input type="hidden" name="req_type" value="PUT">
             <input type="hidden" name="prog_id" value="<?php echo $program['prog_id']?>">
             <input type="hidden" name="user_id" value="<?php echo $id?>">
             <label>Why do you want to join this program?</label><br>
-            <textarea name="purpose_statement" rows="10" cols="50" required>
-                <?php echo isset($purpose_statement) ? $purpose_statement : '' ?>
-            </textarea><br>
+            <textarea name="purpose_statement" rows="10" cols="50" required><?php echo isset($purpose_statement) ? $purpose_statement : '' ?></textarea><br><br>
 
             <label>Are you currently enrolled in other uncompleted certifications sponsored by the Cybersecurity Center? (Optional) </label> <br>
-            <textarea name="oncom_cert" rows="5" cols="50">
-                </textarea><?php echo isset($uncom_cert) ? $uncom_cert : '' ?><br> 
+            <textarea name="oncom_cert" rows="5" cols="50"><?php echo isset($uncom_cert) ? $uncom_cert : '' ?></textarea><br><br>
 
             <label>Have you completed any cybersecurity industry certifications via the Cybersecurity Center? (Optional) </label> <br>
-            <textarea name="com_cert" rows="5" cols="50">
-                <?php echo isset($com_cert)? $com_cert : '' ?>
-            </textarea><br> 
+            <textarea name="com_cert" rows="5" cols="50"><?php echo isset($com_cert)? $com_cert : '' ?></textarea><br><br>
             
-            <button type="submit" value="Submit">Submit</button>
-            <?php 
-                if ($application) {
-                    echo '<form action="program_dir.php" method="POST">
-                            <input type="hidden" name="req_type" value="DELETE">
-                            <input type="hidden" name="prog_id" value="' . $program['prog_id'] . '">
-                            <input type="hidden" name="user_id" value="' . $id . '">
-                            <input type="submit" value="Delete">
-                        </form>';
-                } 
-            ?>
+            <button class="btn btn-dark" type="submit" value="Submit"><?php echo isset($purpose_statement) ? 'Update' : 'Submit' ?></button>
         </form> 
+        <?php 
+            if ($application) {
+                echo '<form action="program_dir.php" method="POST">
+                        <input type="hidden" name="req_type" value="DELETE">
+                        <input type="hidden" name="prog_id" value="' . $program['prog_id'] . '">
+                        <input type="hidden" name="user_id" value="' . $id . '">
+                        <button class="btn btn-danger" type="submit" value="Delete">Delete</button>
+                        </form>';
+            } 
+        ?>
     </body>
 </html>

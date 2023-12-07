@@ -99,7 +99,7 @@ $conn->close();
             $action_url = 'track_program.php';
         } else if ($title == 'Pending Programs') {
             $action_label = 'View Applications';
-            $action_url = 'view_appliation.php';
+            $action_url = 'application.php';
         } else if ($title == 'Available Programs') {
             $action_label = 'Apply';
             $action_url = 'application.php';
