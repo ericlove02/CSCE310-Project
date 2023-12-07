@@ -316,7 +316,10 @@ $internships = getAllRecords($conn, 'internships');
 
         </form>
     </section>
-
+    <section>
+        <h3>My Programs & Applications</h3>
+        <a href="program_dir.php" class="btn btn-dark">Go to Program Directory</a>
+    </section>
     <section>
         <h3>Courses</h3>
         <h4>All Courses</h4>
@@ -486,54 +489,6 @@ $internships = getAllRecords($conn, 'internships');
         </form>
     </section>
 
-    <?php
-    if ($_SERVER["REQUEST_METHOD"] == "POST") {
-        if (isset($_POST['insert'])) {
-            $sql = "INSERT INTO applications (app_date_applied, app_purpose, app_resume, app_type) VALUES ('" . $_POST['app_date_applied'] . "', '" . $_POST['app_purpose'] . "', '" . $_POST['app_resume'] . "', '" . $_POST['app_type'] . "')";
-        } elseif (isset($_POST['update'])) {
-            $app_id = $_POST['app_id'];
-            // $sql = "UPDATE applications SET ... WHERE app_id = $app_id";
-        } elseif (isset($_POST['delete'])) {
-            $app_id = $_POST['app_id'];
-            // $sql = "DELETE FROM applications WHERE app_id = $app_id";
-        }
-    }
-    //bruh
-    $sql = "SELECT * FROM applications WHERE user_id = '$id'";
-    $result = $conn->query($sql);
-
-    echo "<table>";
-    echo "<tr><th>Application ID</th><th>Date Applied</th><th>Purpose Statement</th><th>Resume</th><th>Type</th><th>Actions</th></tr>";
-
-    if ($result->num_rows > 0) {
-        while ($row = $result->fetch_assoc()) {
-            echo "<tr><td>" . $row["app_id"] . "</td><td>" . $row["app_date_applied"] . "</td><td>" . $row["app_purpose"] . "</td><td>" . $row["app_resume"] . "</td><td>" . $row["app_type"] . "</td>";
-            echo "<td>
-                    <form method='post'>
-                        <input type='hidden' name='app_id' value='" . $row["app_id"] . "'>
-                        <input type='submit' name='update' value='Update'>
-                        <input type='submit' name='delete' value='Delete'>
-                    </form>
-                </td></tr>";
-        }
-    } else {
-        echo "<tr><td colspan='6'>No results</td></tr>";
-    }
-
-    echo "</table>";
-    ?>
-
-    <form method="post">
-        <label for="app_date_applied">Date Applied:</label><br>
-        <input type="date" id="app_date_applied" name="app_date_applied"><br>
-        <label for="app_purpose">Purpose Statement:</label><br>
-        <input type="text" id="app_purpose" name="app_purpose"><br>
-        <label for="app_resume">Resume:</label><br>
-        <input type="text" id="app_resume" name="app_resume"><br>
-        <label for="app_type">Type:</label><br>
-        <input type="text" id="app_type" name="app_type"><br>
-        <input type="submit" name="insert" value="Insert" class="btn btn-dark">
-    </form>
 </body>
 
 

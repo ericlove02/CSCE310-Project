@@ -1,6 +1,7 @@
 <?php
 require_once "utils/connect.php";
 
+// switch to new account from users button press
 if (@$_POST['doChangeUser']) {
     session_start();
     $_SESSION['user_id'] = $_POST['user_id'];
@@ -8,6 +9,7 @@ if (@$_POST['doChangeUser']) {
     return;
 }
 
+// get count of rows from table name
 function getTableRowCount($conn, $tableName)
 {
     $sql = "SELECT COUNT(*) AS count FROM $tableName";
@@ -19,6 +21,7 @@ function getTableRowCount($conn, $tableName)
     return $row['count'];
 }
 
+// select all entities from a table
 function getAllRecords($conn, $tableName)
 {
     $sql = "SELECT * FROM $tableName";
@@ -33,9 +36,11 @@ function getAllRecords($conn, $tableName)
     return $records;
 }
 
+// update a table given the table name and a dict of values
 function updateRecord($conn, $tableName, $recordId, $recordData)
 {
     $updateValues = '';
+    // parse value pairs
     foreach ($recordData as $column => $value) {
         if (strpos($column, '_id') !== false) {
             $id_key = $column;
@@ -55,7 +60,7 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
     }
 }
 
-
+// insert into given table name with dict of values
 function addRecord($conn, $tableName, $recordData)
 {
     $columns = implode(', ', array_keys($recordData));
@@ -69,6 +74,7 @@ function addRecord($conn, $tableName, $recordData)
     }
 }
 
+// generate reports 
 function generateReport($conn, $selectedReport)
 {
     switch ($selectedReport) {
@@ -159,8 +165,8 @@ function generateReport($conn, $selectedReport)
                 races r ON sr.race_id = r.race_id
             WHERE
                 r.race_name != 'White'";
-        $result = $conn->query($sql);
-        return $result->fetch_all(MYSQLI_ASSOC);
+            $result = $conn->query($sql);
+            return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_fed_interns':
             $sql = "SELECT
                         COUNT(DISTINCT s.user_id) AS students
@@ -243,15 +249,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             die("Select application details failed: " . $conn->error);
         }
     }
+    // if posted to generate a report
     if (isset($_POST['generate_report'])) {
         $selectedReport = $_POST['selected_report'];
         $reportData = generateReport($conn, $selectedReport);
     }
+    // if posted to update a record
     if (isset($_POST['update_record'])) {
         $selectedRecordId = $_POST['selected_record_id'];
         $recordData = array();
 
-        // handle data based on selected table
+        // handle data based on which table was selected
         switch ($_POST['selected_table']) {
             case 'users':
                 $recordData['user_id'] = $_POST['selected_record_id'];
@@ -354,6 +362,7 @@ $programs = getAllRecords($conn, 'programs');
 $courses = getAllRecords($conn, 'courses');
 $users = getAllRecords($conn, 'users');
 
+// get all aplications along with their user and program data
 $sql = "SELECT applications.*, users.*, programs.* 
             FROM applications 
             JOIN users ON applications.user_id = users.user_id 
@@ -453,8 +462,10 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
         if (isset($reportData)) {
             echo "<h4>Generated Report</h4>";
             if ($reportData == null) {
+                // if no data returned
                 echo "<p>No data to display</p>";
             } elseif (is_array($reportData)) {
+                // if an array returned show as table
                 echo "<table border='1'>";
                 echo "<tr>";
                 foreach ($reportData[0] as $column => $value) {
@@ -689,7 +700,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
             <select name="selected_record_id">
                 <?php
                 foreach ($applications as $application) {
-                    echo "<option value='{$application['app_id']}'>{$application['app_id']}</option>";
+                    echo "<option value='{$application['app_id']}'>{$application['app_id']} - {$application['f_name']} {$application['l_name']}, {$application['prog_name']}</option>";
                 }
                 ?>
             </select>
@@ -705,7 +716,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
             <button type="submit" name="update_app" class="btn btn-dark">Update Application</button>
         </form>
     </section>
-    <hr />
+    <!-- <hr />
     <section>
         <h3>Trainings</h3>
         <table border="1">
@@ -749,7 +760,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
             <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
             <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
         </form>
-    </section>
+    </section> -->
     <hr />
     <section>
         <h3>Certifications</h3>
