@@ -156,7 +156,7 @@ $conn->close();
 
     <?php
     if ($application) {
-        echo '<form action="program_dir.php" method="POST">
+        echo '<form action="application.php" method="POST">
             <input type="hidden" name="req_type" value="DELETE">
             <input type="hidden" name="prog_id" value="' . $program['prog_id'] . '">
             <input type="hidden" name="user_id" value="' . $id . '">
