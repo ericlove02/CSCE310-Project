@@ -19,7 +19,7 @@ function add_attendance($event_id, $user_id)
 
 $event_data = $conn->execute_query("SELECT * FROM events WHERE event_id = ?", [$_GET["id"]])->fetch_assoc();
 
-$UIN_list = preg_replace(['/[^0-9]+/'], [', '], $_POST['UINlist'] ?? '');
+$UIN_list = preg_replace(['/[^0-9]+/', '/, $/'], [', ', ''], $_POST['UINlist'] ?? '');
 
 if ($UIN_list != '') {
     if ($_POST['submit'] == 'add') {
