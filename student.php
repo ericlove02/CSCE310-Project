@@ -331,7 +331,6 @@ $internships = getAllRecords($conn, 'internships');
         <h3>My Programs & Applications</h3>
         <?php
 
-
         $id = $_SESSION['user_id'];
 
         // get user
