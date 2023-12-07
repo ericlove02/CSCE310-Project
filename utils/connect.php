@@ -19,4 +19,19 @@ if ($conn->connect_error) {
     body {
         padding: 1em;
     }
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    th,
+    td {
+        border: 1px solid #ddd !important;
+        padding: 8px;
+    }
+
+    th {
+        background-color: #500000;
+        color: white;
+    }
 </style>
