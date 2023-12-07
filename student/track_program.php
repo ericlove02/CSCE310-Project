@@ -193,9 +193,11 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
                     ?>
                 </select>
                 <br>
-                <button type="submit" name="add_cert" class="btn btn-dark">Add Cert</button>
-                <button type="submit" name="drop_cert" class="btn btn-dark">Drop Cert</button>
-                <button type="submit" name="comp_cert" class="btn btn-dark">Complete Cert</button>
+                <div style="padding-top: 1rem">
+                    <button type="submit" name="add_cert" class="btn btn-dark">Add Cert</button>
+                    <button type="submit" name="drop_cert" class="btn btn-dark">Drop Cert</button>
+                    <button type="submit" name="comp_cert" class="btn btn-dark">Complete Cert</button>
+                </div>
             </form>
         </section>
     </div>
