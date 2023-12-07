@@ -602,9 +602,10 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
         <h3>Event Management</h3>
         <table border="1">
             <tr>
-                <th>Event Id</th>
-                <th>Event Name</th>
-                <th>Event Location</th>
+                <th>Id</th>
+                <th>Name</th>
+                <th>Location</th>
+                <th>Attendance</th>
                 <th></th>
             </tr>
 
@@ -614,7 +615,8 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 echo "<td><span>{$event['event_id']}</span></td>";
                 echo "<td><span>{$event['event_name']}</span></td>";
                 echo "<td><span>{$event['event_location']}</span></td>";
-                echo "<td><a href='event_attendance.php?id={$event['event_id']}'><button class='btn btn-dark'>Edit attendance</button></a></td>";
+                echo "<td>", $conn->execute_query('SELECT count(user_id) as count FROM attendedevents WHERE event_id = ?', [$event['event_id']])->fetch_assoc()['count'], " people </td>";
+                echo "<td><a href='event_attendance.php?id={$event['event_id']}' style='right:0px;position:'><button class='btn btn-dark'>Edit attendance</button></a></td>";
                 echo "</tr>";
             }
             ?>
