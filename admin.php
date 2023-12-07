@@ -1,6 +1,13 @@
 <?php
 require_once "utils/connect.php";
 
+if (@$_POST['doChangeUser']) {
+    session_start();
+    $_SESSION['user_id'] = $_POST['user_id'];
+    header("Location: student.php");
+    return;
+}
+
 function getTableRowCount($conn, $tableName)
 {
     $sql = "SELECT COUNT(*) AS count FROM $tableName";
@@ -176,7 +183,8 @@ function generateReport($conn, $selectedReport)
         case 'report_intern_locs':
             $sql = "SELECT
                         COUNT(DISTINCT s.user_id) AS students,
-                        i.intshp_state
+                        i.intshp_state,
+                        i.intshp_year
                     FROM
                         students s
                     JOIN
@@ -184,7 +192,7 @@ function generateReport($conn, $selectedReport)
                     JOIN
                         internships i ON si.intshp_id = i.intshp_id
                     GROUP BY
-                        i.intshp_state";
+                        i.intshp_state, i.intshp_year";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
         default:
@@ -392,7 +400,9 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                     "attendedevents" => "attended events",
                     "studenttrainings" => "student trainings",
                     "studentcerts" => "student certifications",
-                    "programenrollments" => "program enrollments"
+                    "programenrollments" => "program enrollments",
+                    "takencourses" => "taken courses",
+                    "studentinternships" => "student internships"
                 )[$table] ?? $table;
 
                 echo "<li>Total number of $tableName: $rowCount</li>";
@@ -480,12 +490,6 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
             </tr>
 
             <?php
-            if (@$_POST['doChangeUser']) {
-                session_start();
-                $_SESSION['user_id'] = $_POST['user_id'];
-                header("Location: student.php");
-                return;
-            }
 
             foreach ($users as $user) {
                 echo "<tr>";
@@ -515,7 +519,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new User</option>
                 <?php
                 foreach ($users as $user) {
-                    echo "<option value='{$user['user_id']}'>{$user['user_id']}</option>";
+                    echo "<option value='{$user['user_id']}'>{$user['user_id']} - {$user['email']}</option>";
                 }
                 ?>
             </select>
@@ -574,7 +578,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new Program</option>
                 <?php
                 foreach ($programs as $program) {
-                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']}</option>";
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']} - {$program['prog_name']}</option>";
                 }
                 ?>
             </select>
@@ -621,7 +625,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new Event</option>
                 <?php
                 foreach ($events as $event) {
-                    echo "<option value='{$event['event_id']}'>{$event['event_id']}</option>";
+                    echo "<option value='{$event['event_id']}'>{$event['event_id']} - {$event['event_name']}</option>";
                 }
                 ?>
             </select>
@@ -723,7 +727,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new Training</option>
                 <?php
                 foreach ($trainings as $training) {
-                    echo "<option value='{$training['train_id']}'>{$training['train_id']}</option>";
+                    echo "<option value='{$training['train_id']}'>{$training['train_id']} - {$training['train_name']}</option>";
                 }
                 ?>
             </select>
@@ -768,7 +772,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new Certification</option>
                 <?php
                 foreach ($certifications as $certification) {
-                    echo "<option value='{$certification['cert_id']}'>{$certification['cert_id']}</option>";
+                    echo "<option value='{$certification['cert_id']}'>{$certification['cert_id']} - {$certification['cert_name']}</option>";
                 }
                 ?>
             </select>
@@ -862,7 +866,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 <option value="add_new">Add new Course</option>
                 <?php
                 foreach ($courses as $course) {
-                    echo "<option value='{$course['cour_id']}'>{$course['cour_id']}</option>";
+                    echo "<option value='{$course['cour_id']}'>{$course['cour_id']} - {$course['cour_name']}</option>";
                 }
                 ?>
             </select>
