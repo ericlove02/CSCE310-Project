@@ -57,7 +57,7 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
             </div>
         </div>
     </nav>
-    
+
     <div style="padding:1rem">
         <?php
         // Check if the user is logged in

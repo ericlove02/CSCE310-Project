@@ -21,7 +21,6 @@ function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_
     } else {
         $sql = "SELECT * FROM $tableName";
     }
-    // echo $sql;
     $result = $conn->query($sql);
     if (!$result) {
         die("Query failed: " . $conn->error);
@@ -49,11 +48,10 @@ function updateRecord($conn, $tableName, $recordId, $recordData)
     $keyValues = rtrim($keyValues, 'AND ');
 
     $sql = "UPDATE $tableName SET $updateValues WHERE $keyValues";
-    // echo $sql;
     if ($conn->query($sql) !== TRUE) {
-        echo "Error updating record: " . $conn->error;
+        makeToast("Error updating record: " . $conn->error, false);
     } else {
-        echo "Entry in $tableName updated";
+        makeToast("Entry in $tableName updated", true);
     }
 }
 
@@ -71,11 +69,10 @@ function addRecord($conn, $tableName, $recordData)
 
     $values = "'" . implode("', '", $filteredValues) . "'";
     $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    // echo $sql;
     if ($conn->query($sql) !== TRUE) {
-        echo "Error adding new record: " . $conn->error;
+        makeToast("Error adding new record: " . $conn->error, false);
     } else {
-        echo "New entry to $tableName added";
+        makeToast("New entry to $tableName added", true);
     }
 }
 
@@ -136,7 +133,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $selectedTable = $_POST['selected_table'];
         if ($selectedRecordId == 'add_new') {
             // show an alert when trying to delete 'add new'
-            echo '<script>alert("Error: Cannot delete a new record.");</script>';
+            makeToast("Cannot delete a new record.", false);
         } else {
             switch ($_POST['selected_table']) {
                 case 'takencourses':
@@ -151,9 +148,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
             }
             if ($conn->query($sql) !== TRUE) {
-                echo "Error deleting record: " . $conn->error;
+                makeToast("Error deleting record: " . $conn->error, false);
             } else {
-                echo "$selectedTable record deleted";
+                makeToast("$selectedTable record deleted", true);
             }
         }
     }

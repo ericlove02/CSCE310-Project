@@ -1,5 +1,6 @@
 <?php
 require_once "utils/connect.php";
+require "utils/notification.php";
 
 session_start();
 
@@ -27,7 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             header("Location: student/info.php");
         }
     } else {
-        echo "Invalid email or password.";
+        makeToast("Invalid email or password.", false);
     }
 }
 

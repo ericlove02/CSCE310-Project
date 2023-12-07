@@ -30,24 +30,24 @@ $certificates = $resultCertificates->fetch_all(MYSQLI_ASSOC);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedRecordId = $_POST['selected_record_id'];
     if (isset($_POST['add_cert'])) {
-        if (count($certificates) > 0) {
-            // Display alert and exit if count is greater than 0
-            echo '<script>alert("Cannot add a certification. Only one certification per program.");</script>';
-            exit;
-        }
-        // Get the current date
-        $currentDate = date("Y-m-d");
+        if (count($certificates) <= 1) {
+            // Get the current date
+            $currentDate = date("Y-m-d");
 
-        // Insert into studentcerts table
-        $sql = "INSERT INTO studentcerts (cert_id, user_id, sc_date_started, sc_date_completed, sc_affliliated_program_id)
+            // Insert into studentcerts table
+            $sql = "INSERT INTO studentcerts (cert_id, user_id, sc_date_started, sc_date_completed, sc_affliliated_program_id)
             VALUES ('$selectedRecordId', '$userId', '$currentDate', '', '$prog_id')";
-        // Execute the SQL query
-        $conn->query($sql);
+            // Execute the SQL query
+            $conn->query($sql);
+        } else {
+            // Display alert and exit if count is greater than 0
+            makeToast("Cannot add a certification. Only one certification per program.", false);
+        }
     }
 
     if (isset($_POST['drop_cert'])) {
         if (count($certificates) > 0 && $selectedRecordId != $certificates[0]["cert_id"]) {
-            echo '<script>alert("Certificate to drop must be attached to your program.");</script>';
+            makeToast("Certificate to drop must be attached to your program.", false);
             exit;
         }
         // Delete from studentcerts table
@@ -94,6 +94,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
     <title>Track Program Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
@@ -129,7 +130,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
                 ?>
             </div>
         </div>
-    </nav> 
+    </nav>
     <div style="padding:1rem">
         <a href="programs.php" class="btn btn-dark" style="margin-top: 10px;">Back to Student</a>
         <h1>

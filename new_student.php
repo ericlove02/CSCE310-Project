@@ -130,6 +130,7 @@ function createSelection($key, $label, $assoc_name_value)
 </head>
 
 <body>
+    <a href="index.php" class="btn btn-dark">Back to Login</a>
     <h2>New Student</h2>
     <form method="post">
         <div class="form-row row">
