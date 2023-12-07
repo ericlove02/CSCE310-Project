@@ -14,65 +14,39 @@ function getTableRowCount($conn, $tableName)
     return $row['count'];
 }
 
+// select all entities from a table
+function getAllRecords($conn, $tableName)
+{
+    $sql = "SELECT * FROM $tableName";
+    $result = $conn->query($sql);
+    if (!$result) {
+        die("Query failed: " . $conn->error);
+    }
+    $records = array();
+    while ($row = $result->fetch_assoc()) {
+        $records[] = $row;
+    }
+    return $records;
+}
+
+function generateProgramReport($conn, $prog_id)
+{
+    $sql = "SELECT 
+            COUNT(DISTINCT pe.user_id) AS enrolled_students
+            FROM 
+                programenrollments pe
+            JOIN 
+                programs p ON pe.prog_id = p.prog_id
+            WHERE 
+                p.prog_id = $prog_id";
+    $result = $conn->query($sql);
+    return $result->fetch_all(MYSQLI_ASSOC);
+}
+
 // generate reports 
 function generateReport($conn, $selectedReport)
 {
     switch ($selectedReport) {
-        case 'report_cldp_stus':
-            $sql = "SELECT 
-                COUNT(DISTINCT pe.user_id) AS enrolled_students
-                FROM 
-                    programenrollments pe
-                JOIN 
-                    programs p ON pe.prog_id = p.prog_id
-                WHERE 
-                    p.prog_name = 'CLDP'";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
-        case 'report_viceroy_stus':
-            $sql = "SELECT 
-                COUNT(DISTINCT pe.user_id) AS enrolled_students
-                FROM 
-                    programenrollments pe
-                JOIN 
-                    programs p ON pe.prog_id = p.prog_id
-                WHERE 
-                    p.prog_name = 'VICEROY'";    
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
-        case 'report_pathways_stus':
-            $sql = "SELECT 
-                COUNT(DISTINCT pe.user_id) AS enrolled_students
-                FROM 
-                    programenrollments pe
-                JOIN 
-                    programs p ON pe.prog_id = p.prog_id
-                WHERE 
-                    p.prog_name = 'Pathways'";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
-        case 'report_cybercorps_stus':
-            $sql = "SELECT 
-                COUNT(DISTINCT pe.user_id) AS enrolled_students
-                FROM 
-                    programenrollments pe
-                JOIN 
-                    programs p ON pe.prog_id = p.prog_id
-                WHERE 
-                    p.prog_name = 'CyberCorps: Scholarship for Service'";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
-        case 'report_dod_stus':
-            $sql = "SELECT 
-                COUNT(DISTINCT pe.user_id) AS enrolled_students
-                FROM 
-                    programenrollments pe
-                JOIN 
-                    programs p ON pe.prog_id = p.prog_id
-                WHERE 
-                    p.prog_name = 'DoD Cybersecurity Scholarship'";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_complete_all':
             $sql = "SELECT
                         COUNT(DISTINCT s.user_id) AS students
@@ -146,9 +120,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // if posted to generate a report
     if (isset($_POST['generate_report'])) {
         $selectedReport = $_POST['selected_report'];
-        $reportData = generateReport($conn, $selectedReport);
+        if (strpos($selectedReport, "program_") !== false) {
+            $prog_id = str_replace("program_", "", $selectedReport);
+            $reportData = generateProgramReport($conn, $prog_id);
+        } else {
+            $reportData = generateReport($conn, $selectedReport);
+        }
     }
 }
+
+// get all records from each table
+$programs = getAllRecords($conn, 'programs');
 ?>
 
 <!DOCTYPE html>
@@ -259,17 +241,17 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         </table>
 
 
-        <h3>Reports</h3>
+        <h2>Reports</h2>
 
         <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
             <label>Select Report:</label>
             <select name="selected_report">
-                <option value="report_cldp_stus">Number of total Cyber Leader Development Program students</option>
-                <option value="report_viceroy_stus">Number of total VICEROY students</option>
-                <option value="report_pathways_stus">Number of total Pathways students</option>
-                <option value="report_cybercorps_stus">Number of total CyberCorps: Scholarship for Service students
-                </option>
-                <option value="report_dod_stus">Number of total DoD Cybersecurity Scholarship Program students</option>
+                <?php
+                // list out all of the programs that have been created
+                foreach ($programs as $program) {
+                    echo "<option value='program_{$program['prog_id']}'>Number of students in the {$program['prog_name']} program</option>";
+                }
+                ?>
                 <option value="report_complete_all">Number of students to complete all course and certification
                     opportunities</option>
                 <option value="report_strat_foreign">Number of students electing to take additional strategic foreign
