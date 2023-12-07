@@ -17,7 +17,16 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
 <html>
 
 <head>
-    <title>Student Information</title>
+    <title>
+        <?php
+            if ($stu_row) {
+                echo "Student Page";
+            } 
+            else {
+                echo "Admin Page";
+            }
+        ?>
+    </title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
@@ -25,23 +34,27 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
 
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
-            <span class="navbar-brand">Student Page</span>
+            <span class="navbar-brand">User Page</span>
 
             <!-- Navbar links -->
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav">
+                    <?php if($stu_row):?>
                     <li class="nav-item">
                         <a class="nav-link" href="courses.php">Courses</a>
                     </li>
+                    <?php endif;?>
                     <li class="nav-item">
                         <a class="nav-link" href="info.php">Information</a>
                     </li>
+                    <?php if($stu_row):?>
                     <li class="nav-item">
                         <a class="nav-link" href="internships.php">Internships</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="programs.php">Programs</a>
                     </li>
+                    <?php endif;?>
                 </ul>
             </div>
 
@@ -66,7 +79,16 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
             echo "You must log in first";
             exit;
         } ?>
-        <h2>Student Information</h2>
+        <h2>
+            <?php
+                if ($stu_row) {
+                    echo "Student Info";
+                } 
+                else {
+                    echo "Admin Info";
+                }
+            ?>
+        </h2>
         <section>
             <form method="post" action="../utils/update.php">
                 <?php
@@ -104,7 +126,7 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
                 
                 // Don't try to show show student info if they are not a student
                 if ($stu_row != true)
-                    die("<br><b>Not a student<b><br>");
+                    die("<br><br>");
 
                 // student stuff
                 // createInput($stu_row, "stu_uin", "UIN"); // new
