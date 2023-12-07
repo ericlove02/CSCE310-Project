@@ -14,6 +14,7 @@ function access_denied() {
     </div>';
 }
 
+session_start();
 if (!isset($_SESSION['user_id'])) {
     access_denied();
     exit;
@@ -21,13 +22,8 @@ if (!isset($_SESSION['user_id'])) {
 
 $current_url = $_SERVER['REQUEST_URI'];
 if (strpos($current_url, 'admin/') !== false) {
-    $id = $_SESSION['user_id'];
-    $sql = "SELECT is_admin FROM users WHERE user_id = $id";
-    $result = $conn->query($sql);
-    $is_admin = $result->fetch_all(MYSQLI_ASSOC)[0]["is_admin"];
-
-    if (!$is_admin) {
-        access_denied();
+    if (isset($_SESSION['admin_id'])) {
+        echo $is_admin;
         exit;
     }
 }

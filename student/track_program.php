@@ -1,17 +1,9 @@
 <?php
-require_once "utils/connect.php";
-require_once "utils/middleware.php";
-
-session_start();
+require_once "../utils/connect.php";
+require_once "../utils/middleware.php";
 
 // Assuming you have a session started and the user's ID is stored in $_SESSION['user_id']
 $userId = $_SESSION['user_id'];
-
-if (!isset($_SESSION['user_id'])) {
-    echo "You must log in first";
-    exit;
-}
-
 $prog_id = $_GET["id"];
 
 $sql = "SELECT prog_name FROM programs WHERE prog_id = $prog_id";
@@ -102,75 +94,111 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
     <title>Track Program Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
-
 <body>
-    <a href="programs.php" class="btn btn-dark">Back to Student</a>
-    <h1>
-        Your
-        <?php echo $prog_name ?> Status
-    </h1>
-    <section>
-        <h3>My
-            <?php echo $prog_name ?> Certificates
-        </h3>
-        <table border="1">
-            <tr>
-                <th>Certification Id</th>
-                <th>Certification Name</th>
-                <th>Date Started</th>
-                <th>Date Completed</th>
-            </tr>
-            <?php
-            // Display certificates
-            foreach ($certificates as $certificate) {
-                echo "<tr>";
-                echo "<td><span>{$certificate['cert_id']}</span></td>";
-                echo "<td><span>{$certificate['cert_name']}</span></td>";
-                echo "<td><span>{$certificate['sc_date_started']}</span></td>";
-                echo "<td><span>{$certificate['sc_date_completed']}</span></td>";
-                echo "</tr>";
-            }
-            ?>
-        </table>
-    </section>
-    <br>
-    <section>
-        <h4>All Certificates
-        </h4>
-        <table border="1">
-            <tr>
-                <th>Certification Id</th>
-                <th>Certification Name</th>
-            </tr>
-            <?php
-            // Display all certificates
-            foreach ($certifications as $certificate) {
-                echo "<tr>";
-                echo "<td><span>{$certificate['cert_id']}</span></td>";
-                echo "<td><span>{$certificate['cert_name']}</span></td>";
-                echo "</tr>";
-            }
-            ?>
-        </table>
-    </section>
-    <br>
-    <section>
-        <h4>Modify Certificates</h4>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $prog_id; ?>">
-            <label>Select Certificate:</label>
-            <select name="selected_record_id">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+            <span class="navbar-brand">Student Page</span>
+
+            <!-- Navbar links -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="courses.php">Courses</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="info.php">Information</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="internships.php">Internships</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="programs.php">Programs</a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Logout button on right side -->
+            <div class="navbar-nav ms-auto">
                 <?php
-                foreach ($certifications as $certificate) {
-                    echo "<option value='{$certificate['cert_id']}'>{$certificate['cert_id']} - {$certificate['cert_name']}</option>";
+                // check if admin_id is not set to show the logout button
+                if (isset($_SESSION['admin_id'])) {
+                    echo '<a href="../admin/users.php" class="btn btn-danger">Return to Admin</a>';
+                } else {
+                    echo '<a href="../utils/logout.php" class="btn btn-danger">Logout</a>';
                 }
                 ?>
-            </select>
-            <br>
-            <button type="submit" name="add_cert" class="btn btn-dark">Add Cert</button>
-            <button type="submit" name="drop_cert" class="btn btn-dark">Drop Cert</button>
-            <button type="submit" name="comp_cert" class="btn btn-dark">Complete Cert</button>
-        </form>
-    </section>
+            </div>
+        </div>
+    </nav> 
+    <div style="padding:1rem">
+        <a href="programs.php" class="btn btn-dark" style="margin-top: 10px;">Back to Student</a>
+        <h1>
+            Your
+            <?php echo $prog_name ?> Status
+        </h1>
+        <section>
+            <h3>My
+                <?php echo $prog_name ?> Certificates
+            </h3>
+            <table border="1">
+                <tr>
+                    <th>Certification Id</th>
+                    <th>Certification Name</th>
+                    <th>Date Started</th>
+                    <th>Date Completed</th>
+                </tr>
+                <?php
+                // Display certificates
+                foreach ($certificates as $certificate) {
+                    echo "<tr>";
+                    echo "<td><span>{$certificate['cert_id']}</span></td>";
+                    echo "<td><span>{$certificate['cert_name']}</span></td>";
+                    echo "<td><span>{$certificate['sc_date_started']}</span></td>";
+                    echo "<td><span>{$certificate['sc_date_completed']}</span></td>";
+                    echo "</tr>";
+                }
+                ?>
+            </table>
+        </section>
+        <br>
+        <section>
+            <h4>All Certificates
+            </h4>
+            <table border="1">
+                <tr>
+                    <th>Certification Id</th>
+                    <th>Certification Name</th>
+                </tr>
+                <?php
+                // Display all certificates
+                foreach ($certifications as $certificate) {
+                    echo "<tr>";
+                    echo "<td><span>{$certificate['cert_id']}</span></td>";
+                    echo "<td><span>{$certificate['cert_name']}</span></td>";
+                    echo "</tr>";
+                }
+                ?>
+            </table>
+        </section>
+        <br>
+        <section>
+            <h4>Modify Certificates</h4>
+            <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $prog_id; ?>">
+                <label>Select Certificate:</label>
+                <select name="selected_record_id">
+                    <?php
+                    foreach ($certifications as $certificate) {
+                        echo "<option value='{$certificate['cert_id']}'>{$certificate['cert_id']} - {$certificate['cert_name']}</option>";
+                    }
+                    ?>
+                </select>
+                <br>
+                <button type="submit" name="add_cert" class="btn btn-dark">Add Cert</button>
+                <button type="submit" name="drop_cert" class="btn btn-dark">Drop Cert</button>
+                <button type="submit" name="comp_cert" class="btn btn-dark">Complete Cert</button>
+            </form>
+        </section>
+    </div>
 </body>
 
 </html>

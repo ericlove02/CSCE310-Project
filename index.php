@@ -24,7 +24,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         } else {
             if (isset($_SESSION['admin_id']))
                 unset($_SESSION['admin_id']);
-            header("Location: student.php");
+            header("Location: student/info.php");
         }
     } else {
         echo "Invalid email or password.";
