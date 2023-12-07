@@ -17,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $recordData['event_id'] = $_POST['selected_record_id'];
                 $recordData['event_name'] = $_POST['record_name'];
                 $recordData['event_location'] = $_POST['record_loc'];
+                $recordData['new_prog'] = $_POST['prog_id'];
                 break;
             default:
                 // default case
@@ -58,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // get all records from each table
 $events = getAllRecords($conn, 'events');
+$programs = getAllRecords($conn, 'programs');
 ?>
 
 <!DOCTYPE html>
@@ -115,6 +117,7 @@ $events = getAllRecords($conn, 'events');
                 <th>Id</th>
                 <th>Name</th>
                 <th>Location</th>
+                <th>Program Name</th>
                 <th>Attendance</th>
                 <th></th>
             </tr>
@@ -125,6 +128,7 @@ $events = getAllRecords($conn, 'events');
                 echo "<td><span>{$event['event_id']}</span></td>";
                 echo "<td><span>{$event['event_name']}</span></td>";
                 echo "<td><span>{$event['event_location']}</span></td>";
+                echo "<td>", $conn->execute_query('SELECT prog_name FROM programs WHERE prog_id = ?', [$event['prog_id']])->fetch_assoc()['prog_name'], "</td>";
                 echo "<td>", $conn->execute_query('SELECT count(user_id) as count FROM attendedevents WHERE event_id = ?', [$event['event_id']])->fetch_assoc()['count'], " people </td>";
                 echo "<td><a href='event_attendance.php?id={$event['event_id']}' style='right:0px;position:'><button class='btn btn-dark'>Edit attendance</button></a></td>";
                 echo "</tr>";
@@ -154,6 +158,14 @@ $events = getAllRecords($conn, 'events');
             <input type="text" name="record_name"><br>
             <label>Event Location:</label>
             <input type="text" name="record_loc"><br>
+            <label>Event Program:</label>
+            <select name="prog_id">
+                <?php
+                foreach ($programs as $program) {
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']} - {$program['prog_name']}</option>";
+                }
+                ?>
+            </select>
 
             <br>
             <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>

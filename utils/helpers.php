@@ -48,8 +48,11 @@ function addRecord($conn, $tableName, $recordData)
 {
     $fixedRecordData = array();
     foreach ($recordData as $columnName => $value) {
-        $fixedColumnName = fixJoinTableVariables($columnName);
-        $fixedRecordData[$fixedColumnName] = $value;
+        if (strpos($columnName, '_id') === false || $columnName === 'user_id') {
+            // key doesn't contain "_id", process it
+            $fixedColumnName = fixJoinTableVariables($columnName);
+            $fixedRecordData[$fixedColumnName] = $value;
+        }
     }
     $columns = implode(', ', array_keys($fixedRecordData));
     $filteredValues = array_filter(array_values($recordData), function ($value) {
@@ -72,6 +75,8 @@ function fixJoinTableVariables($columnName)
         return "cour_id";
     } elseif ($columnName == "new_intshp") {
         return "intshp_id";
+    } elseif ($columnName == "new_prog") {
+        return "prog_id";
     } else {
         return $columnName;
     }

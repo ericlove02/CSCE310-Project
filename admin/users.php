@@ -67,9 +67,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
             }
             if ($conn->query($sql) !== TRUE) {
-                echo "Error deleting record: " . $conn->error;
+                makeToast("Error deleting record: " . $conn->error, false);
             } else {
-                echo "$selectedTable record deleted";
+                makeToast("$selectedTable record deleted", true);
             }
         }
     }
