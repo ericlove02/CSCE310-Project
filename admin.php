@@ -153,10 +153,14 @@ function generateReport($conn, $selectedReport)
                 COUNT(DISTINCT s.user_id) AS students
             FROM
                 students s
+            JOIN
+                studentraces sr ON s.user_id = sr.user_id
+            JOIN
+                races r ON sr.race_id = r.race_id
             WHERE
-                s.stu_hisp_latino = 1";
-            $result = $conn->query($sql);
-            return $result->fetch_all(MYSQLI_ASSOC);
+                r.race_name != 'White'";
+        $result = $conn->query($sql);
+        return $result->fetch_all(MYSQLI_ASSOC);
         case 'report_fed_interns':
             $sql = "SELECT
                         COUNT(DISTINCT s.user_id) AS students
