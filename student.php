@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id'])) {
 }
 
 if (isset($_SESSION['admin_id'])) {
-    echo '<a href="admin.php" class="btn btn-danger">Return to Admin</a>';
+    echo '<a href="admin/users.php" class="btn btn-danger">Return to Admin</a>';
 }
 
 require 'utils/connect.php';

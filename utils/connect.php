@@ -17,7 +17,7 @@ if ($conn->connect_error) {
 ?>
 <style>
     /* Cool hack to pad every page */
-    body {
+    section {
         padding: 1em;
     }
 
