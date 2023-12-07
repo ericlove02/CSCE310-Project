@@ -254,18 +254,6 @@ $programs = getAllRecords($conn, 'programs');
                 ?>
                 <option value="report_complete_all">Number of students to complete all course and certification
                     opportunities</option>
-                <option value="report_strat_foreign">Number of students electing to take additional strategic foreign
-                    language courses</option>
-                <option value="report_crypto">Number of students electing to take other cryptography and cryptographic
-                    mathematics courses</option>
-                <option value="report_data_sci">Number of students electing to carry additional data science and related
-                    courses</option>
-                <option value="report_enroll_dod_cour">Number of students to enroll in DoD 8570.01M preparation training
-                    courses</option>
-                <option value="report_complete_dod_cour">Number of students to complete DoD 8570.01M preparation
-                    training courses</option>
-                <option value="report_enroll_dod_exam">Number of students to complete a DoD 8570.01M certification
-                    examination</option>
                 <option value="report_minority">Minority participation</option>
                 <option value="report_k_12_sc">Number of K-12 students enrolled in summer camps</option>
                 <option value="report_fed_interns">Number of students pursuing federal internships</option>
