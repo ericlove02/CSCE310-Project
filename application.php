@@ -42,7 +42,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
 
     if ($result) {
         echo "Application submitted successfully";
-        header("Location: program_dir.php");
+        header("Location: student.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
@@ -57,7 +57,7 @@ else if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "DELETE")
 
     if ($result) {
         echo "Application deleted successfully";
-        header("Location: program_dir.php");
+        header("Location: student.php");
     } else {
         echo "Error: " . $sql . "<br>" . $conn->error;
     }
