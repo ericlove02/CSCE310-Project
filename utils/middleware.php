@@ -23,7 +23,6 @@ if (!isset($_SESSION['user_id'])) {
 $current_url = $_SERVER['REQUEST_URI'];
 if (strpos($current_url, 'admin/') !== false) {
     if (isset($_SESSION['admin_id'])) {
-        echo $is_admin;
         exit;
     }
 }
