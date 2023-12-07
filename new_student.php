@@ -128,75 +128,107 @@ function createSelection($key, $label, $assoc_name_value)
     <title>New student</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
+<style>
+    body {
+        background-color: #500000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100vh;
+        margin: 0;
+    }
+
+    .form-container {
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 15px;
+        box-shadow: 0px 0px 20px 0px #000000;
+    }
+
+    h2 {
+        color: #50000;
+        text-align: center;
+    }
+
+    .back-button {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+    }
+</style>
+
 
 <body>
-    <h2>New Student</h2>
-    <form method="post">
-        <div class="form-row row">
+    <a href="index.php" class="btn btn-dark back-button">Back to Login</a>
+    <div class="form-container">
+        <h2>New Student</h2>
+        <form method="post">
+            <div class="form-row row">
+                <?php
+                createInput("email", "Email", "col-md-3");
+                createInput("password", "Password", "col-md-3");
+                createInput("stu_uin", "UIN", "col-md-3");
+                createInput("phone", "Phone", "col-md-3");
+                ?>
+            </div>
+            <div class="form-row row">
+                <?php
+                createInput("f_name", "First Name", "col-md-5");
+                createInput("l_name", "Last Name", "col-md-2");
+                createInput("m_initial", "Middle Initial", "col-md-5");
+                ?>
+            </div>
+            <div class="form-row row">
+                <?php
+                createInput("stu_gender", "Gender", "col-md-4");
+                createDate("stu_dob", "Date of Birth", "col-md-4");
+                createInput("stu_discord", "Discord username", "col-md-4");
+                ?>
+            </div>
             <?php
-            createInput("email", "Email", "col-md-3");
-            createInput("password", "Password", "col-md-3");
-            createInput("stu_uin", "UIN", "col-md-3");
-            createInput("phone", "Phone", "col-md-3");
+            createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
             ?>
-        </div>
-        <div class="form-row row">
+            <div class="form-row row">
+                <?php
+                createDefaultInput("stu_school", "School", "Texas A&M University", "col-md-4");
+                createDate("stu_grad_expect", "Expected graduation date", "col-md-4");
+                ?>
+            </div>
             <?php
-            createInput("f_name", "First Name", "col-md-5");
-            createInput("l_name", "Last Name", "col-md-2");
-            createInput("m_initial", "Middle Initial", "col-md-5");
+
+            // is_admin
+            
+            // student stuff
+            
+
+            createCheckbox("stu_hisp_latino", "Hispanic?");
+            createCheckbox("stu_uscitizen", "US Citizen?");
+            createCheckbox("stu_firstgen", "First generation college student?");
             ?>
-        </div>
-        <div class="form-row row">
+            <div class="form-row row">
+                <?php
+                createInput("stu_major", "Student major", "col-md-3");
+                createDefaultInput("stu_major2", "Student major 2", "N/A", "col-md-3");
+                createDefaultInput("stu_minor", "Student minor", "N/A", "col-md-2");
+                createDefaultInput("stu_minor2", "Student minor 2", "N/A", "col-md-2"); // new
+                createInput("stu_gpa", "Student GPA", "col-md-2"); // new
+                ?>
+            </div>
             <?php
-            createInput("stu_gender", "Gender", "col-md-4");
-            createDate("stu_dob", "Date of Birth", "col-md-4");
-            createInput("stu_discord", "Discord username", "col-md-4");
+            createCheckbox("stu_in_rotc", "In ROTC?"); // new 
+            createCheckbox("stu_in_corp", "In Corps of Cadets?"); // new
+            createCheckbox("stu_in_cyber_club", "In Cybersecurity Club?"); // new
+            createCheckbox("stu_in_women_cyber", "In Women in Cybersecurity?"); // new
+            
+
+
+            // new fields
             ?>
-        </div>
-        <?php
-        createSelection("stu_classification", "Classification", array("K-12" => "K-12", "Undergraduate" => "Undergraduate"));
-        ?>
-        <div class="form-row row">
-            <?php
-            createDefaultInput("stu_school", "School", "Texas A&M University", "col-md-4");
-            createDate("stu_grad_expect", "Expected graduation date", "col-md-4");
-            ?>
-        </div>
-        <?php
-
-        // is_admin
-        
-        // student stuff
-        
-
-        createCheckbox("stu_hisp_latino", "Hispanic?");
-        createCheckbox("stu_uscitizen", "US Citizen?");
-        createCheckbox("stu_firstgen", "First generation college student?");
-        ?>
-        <div class="form-row row">
-            <?php
-            createInput("stu_major", "Student major", "col-md-3");
-            createDefaultInput("stu_major2", "Student major 2", "N/A", "col-md-3");
-            createDefaultInput("stu_minor", "Student minor", "N/A", "col-md-2");
-            createDefaultInput("stu_minor2", "Student minor 2", "N/A", "col-md-2"); // new
-            createInput("stu_gpa", "Student GPA", "col-md-2"); // new
-            ?>
-        </div>
-        <?php
-        createCheckbox("stu_in_rotc", "In ROTC?"); // new 
-        createCheckbox("stu_in_corp", "In Corps of Cadets?"); // new
-        createCheckbox("stu_in_cyber_club", "In Cybersecurity Club?"); // new
-        createCheckbox("stu_in_women_cyber", "In Women in Cybersecurity?"); // new
-        
 
 
-        // new fields
-        ?>
-
-
-        <input type="submit">
-    </form>
+            <input type="submit" class="btn btn-dark">
+        </form>
+    </div>
 </body>
 
 </html>

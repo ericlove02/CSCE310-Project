@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/notification.php";
 
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -36,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 die("Delete from applications failed: " . $conn->error);
             }
 
-            echo "Application updated successfully.";
+            makeToast("Application updated successfully.", true);
         } else {
             die("Select application details failed: " . $conn->error);
         }

@@ -13,15 +13,9 @@ function fetch_application($user_id, $prog_id)
     return $application;
 }
 
-session_start();
-
-// Check if the user is logged in
-if (!isset($_SESSION['user_id'])) {
-    echo "You must log in first";
-    exit;
-}
-
+require '../utils/middleware.php';
 require '../utils/connect.php';
+require "../utils/notification.php";
 
 // check if post request was made
 if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
@@ -42,10 +36,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
     $result = $sql->execute([$purpose_statement, $oncom_cert, $com_cert]);
 
     if ($result) {
-        echo "Application submitted successfully";
+        makeToast("Application submitted successfully", true);
+
+
         header("Location: programs.php");
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        makeToast("Error submitting application: " . $conn->error, false);
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "DELETE") {
     $prog_id = $_POST['prog_id'];
@@ -55,10 +51,10 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
     $result = $conn->query($sql);
 
     if ($result) {
-        echo "Application deleted successfully";
+        makeToast("Application deleted successfully", true);
         header("Location: programs.php");
     } else {
-        echo "Error: " . $sql . "<br>" . $conn->error;
+        makeToast("Error deleting application: " . $conn->error, false);
     }
 } else if ($_SERVER["REQUEST_METHOD"] == "GET") {
     // get user
