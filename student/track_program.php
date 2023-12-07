@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/notification.php";
 
 // Assuming you have a session started and the user's ID is stored in $_SESSION['user_id']
 $userId = $_SESSION['user_id'];
@@ -30,7 +31,7 @@ $certificates = $resultCertificates->fetch_all(MYSQLI_ASSOC);
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedRecordId = $_POST['selected_record_id'];
     if (isset($_POST['add_cert'])) {
-        if (count($certificates) <= 1) {
+        if (count($certificates) < 1) {
             // Get the current date
             $currentDate = date("Y-m-d");
 

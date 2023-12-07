@@ -1,6 +1,7 @@
 <?php
 require '../utils/connect.php';
 require '../utils/middleware.php';
+require "../utils/notification.php";
 
 $id = $_SESSION['user_id'];
 
