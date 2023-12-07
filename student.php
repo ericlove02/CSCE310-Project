@@ -7,6 +7,10 @@ if (!isset($_SESSION['user_id'])) {
     exit;
 }
 
+if (isset($_SESSION['admin_id'])) {
+    echo '<a href="admin.php" class="btn btn-danger">Return to Admin</a>';
+}
+
 require 'utils/connect.php';
 
 $id = $_SESSION['user_id'];
@@ -184,6 +188,12 @@ $internships = getAllRecords($conn, 'internships');
 </head>
 
 <body>
+    <?php
+    // check if admin_id is not set to show the logout button
+    if (!isset($_SESSION['admin_id'])) {
+        echo '<a href="utils/logout.php" class="btn btn-danger">Logout</a>';
+    }
+    ?>
     <h2>Student Information</h2>
     <form method="post" action="utils/update.php">
         <?php
@@ -316,21 +326,21 @@ $internships = getAllRecords($conn, 'internships');
 
         </form>
     </section>
-    <hr/>
+    <hr />
     <section>
-            <h3>My Programs & Applications</h3>
-            <?php
+        <h3>My Programs & Applications</h3>
+        <?php
 
 
-$id = $_SESSION['user_id'];
+        $id = $_SESSION['user_id'];
 
-// get user
-$sql = "SELECT * FROM users WHERE user_id = '$id'";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
+        // get user
+        $sql = "SELECT * FROM users WHERE user_id = '$id'";
+        $result = $conn->query($sql);
+        $row = $result->fetch_assoc();
 
-// get enrollment status 
-$sql = "
+        // get enrollment status 
+        $sql = "
 SELECT * FROM programs
 WHERE programs.prog_id IN ( 
     SELECT programenrollments.prog_id 
@@ -338,11 +348,11 @@ WHERE programs.prog_id IN (
     WHERE programenrollments.user_id = ${id} 
 );";
 
-$result = $conn->query($sql);
-$enrolled_programs = $result->fetch_all();
+        $result = $conn->query($sql);
+        $enrolled_programs = $result->fetch_all();
 
-// get pending programs (application but not enrolled)
-$sql = "
+        // get pending programs (application but not enrolled)
+        $sql = "
 SELECT * FROM programs
 WHERE programs.prog_id NOT IN( 
     SELECT programenrollments.prog_id 
@@ -353,11 +363,11 @@ WHERE programs.prog_id NOT IN(
     FROM applications
     WHERE applications.user_id = ${id}
 );";
-$result = $conn->query($sql);
-$pending_programs = $result->fetch_all();
+        $result = $conn->query($sql);
+        $pending_programs = $result->fetch_all();
 
-// get available programs
-$sql = "
+        // get available programs
+        $sql = "
 SELECT * FROM programs
 WHERE programs.prog_id NOT IN( 
     SELECT programenrollments.prog_id 
@@ -368,61 +378,61 @@ WHERE programs.prog_id NOT IN(
     FROM applications
     WHERE applications.user_id = ${id} 
 );";
-$result = $conn->query($sql);
-$available_programs = $result->fetch_all();
+        $result = $conn->query($sql);
+        $available_programs = $result->fetch_all();
 
-$conn->close();
-?>
+        $conn->close();
+        ?>
 
 
-    <?php
-    function generateProgramTable($title, $programs)
-    {
-        $action_label = '';
-        $action_url = '';
+        <?php
+        function generateProgramTable($title, $programs)
+        {
+            $action_label = '';
+            $action_url = '';
 
-        if ($title == 'Enrolled Programs') {
-            $action_label = 'View Progress';
-            $action_url = 'track_program.php';
-        } else if ($title == 'Pending Programs') {
-            $action_label = 'View Applications';
-            $action_url = 'application.php';
-        } else if ($title == 'Available Programs') {
-            $action_label = 'Apply';
-            $action_url = 'application.php';
-        }
+            if ($title == 'Enrolled Programs') {
+                $action_label = 'View Progress';
+                $action_url = 'track_program.php';
+            } else if ($title == 'Pending Programs') {
+                $action_label = 'View Applications';
+                $action_url = 'application.php';
+            } else if ($title == 'Available Programs') {
+                $action_label = 'Apply';
+                $action_url = 'application.php';
+            }
 
-        echo "<h3>$title</h2>";
-        echo "<table>";
-        echo "<tr>";
-        echo "<th>Program ID</th>";
-        echo "<th>Program Name</th>";
-        echo "<th>Actions</th>";
-        echo "</tr>";
-
-        foreach ($programs as $program) {
+            echo "<h3>$title</h2>";
+            echo "<table>";
             echo "<tr>";
-            echo "<td>" . $program[0] . "</td>";
-            echo "<td>" . $program[1] . "</td>";
-            echo "<td>";
-            echo "<a href='" . $action_url . "?id=" . $program[0] . "'><button class='btn btn-dark'>" . $action_label . "</button></a>";
-            echo "</td>";
+            echo "<th>Program ID</th>";
+            echo "<th>Program Name</th>";
+            echo "<th>Actions</th>";
             echo "</tr>";
+
+            foreach ($programs as $program) {
+                echo "<tr>";
+                echo "<td>" . $program[0] . "</td>";
+                echo "<td>" . $program[1] . "</td>";
+                echo "<td>";
+                echo "<a href='" . $action_url . "?id=" . $program[0] . "'><button class='btn btn-dark'>" . $action_label . "</button></a>";
+                echo "</td>";
+                echo "</tr>";
+            }
+
+            if (count($programs) == 0) {
+                echo "<tr><td colspan='3'>No results</td></tr>";
+            }
+
+            echo "</table>";
         }
 
-        if (count($programs) == 0) {
-            echo "<tr><td colspan='3'>No results</td></tr>";
-        }
-
-        echo "</table>";
-    }
-
-    generateProgramTable("Enrolled Programs", $enrolled_programs);
-    generateProgramTable("Pending Programs", $pending_programs);
-    generateProgramTable("Available Programs", $available_programs);
-    ?>
+        generateProgramTable("Enrolled Programs", $enrolled_programs);
+        generateProgramTable("Pending Programs", $pending_programs);
+        generateProgramTable("Available Programs", $available_programs);
+        ?>
     </section>
-    <hr/>
+    <hr />
     <section>
         <h3>Courses</h3>
         <h4>All Courses</h4>
@@ -496,7 +506,7 @@ $conn->close();
     </section>
 
     <!-- Fetch and display the student's internships -->
-    <hr/>
+    <hr />
     <section>
         <h3>Internships</h3>
         <h4>All Internships</h4>

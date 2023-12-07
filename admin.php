@@ -4,9 +4,17 @@ require_once "utils/connect.php";
 // switch to new account from users button press
 if (@$_POST['doChangeUser']) {
     session_start();
+    // store the admins id so they can return
+    $_SESSION['admin_id'] = $_SESSION['user_id'];
+    // store the user id that they are checking out
     $_SESSION['user_id'] = $_POST['user_id'];
     header("Location: student.php");
     return;
+}
+
+if (isset($_SESSION['admin_id'])) {
+    $_SESSION['user_id'] = $_SESSION['admin_id'];
+    unset($_SESSION['admin_id']);
 }
 
 // get count of rows from table name
@@ -382,6 +390,9 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body>
+    <?php
+    echo '<a href="utils/logout.php" class="btn btn-danger">Logout</a>';
+    ?>
     <h1>Admin Page</h1>
     <section>
         <h3>Stats</h3>

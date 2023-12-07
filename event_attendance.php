@@ -60,6 +60,7 @@ if ($UIN_list != '') {
 </head>
 
 <body>
+    <a href="admin.php" class="btn btn-dark">Back to Admin Page</a>
     <div class="container center-box">
         <h1 class="text-center">
             <?php echo $event_data['event_name']; ?>

@@ -22,6 +22,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if ($row['is_admin'] == 1) {
             header("Location: admin.php");
         } else {
+            if (isset($_SESSION['admin_id']))
+                unset($_SESSION['admin_id']);
             header("Location: student.php");
         }
     } else {
@@ -40,23 +42,71 @@ $conn->close();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+    <style>
+        body {
+            background-color: #500000;
+            /* maroon */
+            color: black;
+            text-align: center;
+            padding: 50px;
+        }
+
+        .center-box {
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            display: inline-block;
+        }
+
+        h2 {
+            margin-bottom: 30px;
+        }
+
+        form {
+            max-width: 300px;
+            margin: auto;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+        }
+
+        a {
+            display: block;
+            margin-top: 20px;
+            text-decoration: none;
+        }
+    </style>
 </head>
 
 <body>
-    <h2>Login</h2>
-    <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
-        <label>Email:</label>
-        <input type="text" name="email" required><br>
+    <div class="center-box">
+        <h2>Login</h2>
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>">
+            <label>Email:</label>
+            <input type="text" name="email" required>
 
-        <label>Password:</label>
-        <input type="password" name="password" required><br>
+            <label>Password:</label>
+            <input type="password" name="password" required>
 
-        <button type="submit" class="btn btn-dark">Sign In</button>
-    </form>
+            <button type="submit" class="btn btn-dark">Sign In</button>
+        </form>
 
-    <br>
-
-    <a href="new_student.php"><button class="btn btn-dark">Sign Up</button></a>
+        <a href="new_student.php" class="btn btn-dark">Sign Up</a>
+    </div>
 </body>
 
 </html>

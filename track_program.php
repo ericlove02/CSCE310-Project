@@ -6,7 +6,7 @@ session_start();
 // Assuming you have a session started and the user's ID is stored in $_SESSION['user_id']
 $userId = $_SESSION['user_id'];
 
-if(!isset($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id'])) {
     echo "You must log in first";
     exit;
 }
@@ -16,13 +16,13 @@ $prog_id = $_GET["id"];
 $sql = "SELECT prog_name FROM programs WHERE prog_id = $prog_id";
 $result = $conn->query($sql);
 
-if(!$result) {
+if (!$result) {
     // Check for errors in the query
-    die("Error: ".$conn->error);
+    die("Error: " . $conn->error);
 }
 
 // Check if any rows were returned
-if($result->num_rows > 0) {
+if ($result->num_rows > 0) {
     $prog_name = $result->fetch_all(MYSQLI_ASSOC)[0]["prog_name"];
 } else {
     // No rows found for the given prog_id
@@ -34,10 +34,10 @@ $sqlCertificates = "SELECT * FROM certifications c JOIN studentcerts sc ON c.cer
 $resultCertificates = $conn->query($sqlCertificates);
 $certificates = $resultCertificates->fetch_all(MYSQLI_ASSOC);
 
-if($_SERVER["REQUEST_METHOD"] == "POST") {
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $selectedRecordId = $_POST['selected_record_id'];
-    if(isset($_POST['add_cert'])) {
-        if(count($certificates) > 0) {
+    if (isset($_POST['add_cert'])) {
+        if (count($certificates) > 0) {
             // Display alert and exit if count is greater than 0
             echo '<script>alert("Cannot add a certification. Only one certification per program.");</script>';
             exit;
@@ -52,8 +52,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $conn->query($sql);
     }
 
-    if(isset($_POST['drop_cert'])) {
-        if(count($certificates) > 0 && $selectedRecordId != $certificates[0]["cert_id"]) {
+    if (isset($_POST['drop_cert'])) {
+        if (count($certificates) > 0 && $selectedRecordId != $certificates[0]["cert_id"]) {
             echo '<script>alert("Certificate to drop must be attached to your program.");</script>';
             exit;
         }
@@ -69,7 +69,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
     $currentDate = date("Y-m-d");
 
-    if(isset($_POST['comp_cert'])) {
+    if (isset($_POST['comp_cert'])) {
         // Update sc_date_completed in studentcerts table
         $sql = "UPDATE studentcerts 
             SET sc_date_completed = '$currentDate'
@@ -103,6 +103,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
 </head>
 
 <body>
+    <a href="student.php" class="btn btn-dark">Back to Student</a>
     <h1>
         Your
         <?php echo $prog_name ?> Status
@@ -120,7 +121,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
             </tr>
             <?php
             // Display certificates
-            foreach($certificates as $certificate) {
+            foreach ($certificates as $certificate) {
                 echo "<tr>";
                 echo "<td><span>{$certificate['cert_id']}</span></td>";
                 echo "<td><span>{$certificate['cert_name']}</span></td>";
@@ -142,7 +143,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
             </tr>
             <?php
             // Display all certificates
-            foreach($certifications as $certificate) {
+            foreach ($certifications as $certificate) {
                 echo "<tr>";
                 echo "<td><span>{$certificate['cert_id']}</span></td>";
                 echo "<td><span>{$certificate['cert_name']}</span></td>";
@@ -154,11 +155,11 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
     <br>
     <section>
         <h4>Modify Certificates</h4>
-        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]).'?id='.$prog_id; ?>">
+        <form method="post" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) . '?id=' . $prog_id; ?>">
             <label>Select Certificate:</label>
             <select name="selected_record_id">
                 <?php
-                foreach($certifications as $certificate) {
+                foreach ($certifications as $certificate) {
                     echo "<option value='{$certificate['cert_id']}'>{$certificate['cert_id']} - {$certificate['cert_name']}</option>";
                 }
                 ?>
