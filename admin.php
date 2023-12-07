@@ -183,7 +183,8 @@ function generateReport($conn, $selectedReport)
         case 'report_intern_locs':
             $sql = "SELECT
                         COUNT(DISTINCT s.user_id) AS students,
-                        i.intshp_state
+                        i.intshp_state,
+                        i.intshp_year
                     FROM
                         students s
                     JOIN
@@ -191,7 +192,7 @@ function generateReport($conn, $selectedReport)
                     JOIN
                         internships i ON si.intshp_id = i.intshp_id
                     GROUP BY
-                        i.intshp_state";
+                        i.intshp_state, i.intshp_year";
             $result = $conn->query($sql);
             return $result->fetch_all(MYSQLI_ASSOC);
         default:
