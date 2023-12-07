@@ -614,7 +614,7 @@ $applications = $result->fetch_all(MYSQLI_ASSOC);
                 echo "<td><span>{$event['event_id']}</span></td>";
                 echo "<td><span>{$event['event_name']}</span></td>";
                 echo "<td><span>{$event['event_location']}</span></td>";
-                echo "<td><a href='event_attendnce.php?id={$event['event_id']}'><button class='btn btn-dark'>Edit attendance</button></a></td>";
+                echo "<td><a href='event_attendance.php?id={$event['event_id']}'><button class='btn btn-dark'>Edit attendance</button></a></td>";
                 echo "</tr>";
             }
             ?>
