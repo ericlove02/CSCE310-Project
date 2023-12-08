@@ -165,8 +165,7 @@ if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
                     ?>
                 <?php endif; ?>
                 <button type="submit" name="submit" class="btn btn-dark">Update</button>
-                <button type="submit" name="submit" class="btn btn-dark"
-                    onclick="return confirm('Are you sure you want to deactivate your account?')">
+                <button type="submit" name="deactivate" class="btn btn-dark">
                     Deactivate Account
                 </button>
             </form>
