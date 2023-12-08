@@ -11,6 +11,14 @@ $row = $result->fetch_assoc();
 
 $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_assoc();
 
+if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
+    makeToast("successfully updated!", true);
+    unset($_SESSION['update_success']);
+}
+else if (isset($_SESSION['update_success']) && !$_SESSION['update_success']) {
+    makeToast("failed to update", false);
+    unset($_SESSION['update_success']);
+}
 ?>
 
 <!DOCTYPE html>
@@ -121,15 +129,8 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
                     createInput($row, "l_name", "Last Name", "col-md-6"); ?>
                 </div>
                 <?php
-
-                // is_admin
-                
                 // Don't try to show show student info if they are not a student
-                if ($stu_row != true)
-                    die("<br><br>");
-
-                // student stuff
-                // createInput($stu_row, "stu_uin", "UIN"); // new
+                if($stu_row):
                 ?>
                 <div class="form-row row">
                     <?php
@@ -165,14 +166,16 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
                 createCheckbox($stu_row, "stu_in_cyber_club", "In Cybersecurity Club?"); // new
                 createCheckbox($stu_row, "stu_in_women_cyber", "In Women in Cybersecurity?"); // new
                 ?>
-
-                <button type="submit" name="submit" class="btn btn-dark">Update
-                </button>
+                <?php endif; ?>
+                <button type="submit" name="submit" class="btn btn-dark">Update</button>
                 <button type="submit" name="submit" class="btn btn-dark"
                     onclick="return confirm('Are you sure you want to deactivate your account?')">
-                    Deactivate Account</button>
+                    Deactivate Account
+                </button>
             </form>
         </section>
+
+        <?php if($stu_row): ?>
         <!-- File modification -->
         <br>
         <section>
@@ -219,6 +222,7 @@ $stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_a
 
             </form>
         </section>
+        <?php endif; ?>
     </div>
 </body>
 

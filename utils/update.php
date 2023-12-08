@@ -46,7 +46,9 @@ $sql2 = "UPDATE students SET " . $stuUpdates . " WHERE user_id = $id";
 header("Location: ../student/info.php");
 if ($conn->execute_query($sql, $userValues) === TRUE && $conn->execute_query($sql2, $stuValues) === TRUE) {
     echo "Record updated successfully";
+    $_SESSION['update_success'] = true;
 } else {
+    $_SESSION['update_success'] = false;
     echo "Error updating record: " . $conn->error;
 }
 
