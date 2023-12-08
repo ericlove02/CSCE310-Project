@@ -1,8 +1,6 @@
 <?php
-require_once "utils/connect.php";
-require "utils/notification.php";
-
 session_start();
+require_once "utils/connect.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST['email'];
@@ -21,13 +19,18 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         // redirect to correct page
         if ($row['is_admin'] == 1) {
-            header("Location: admin/applications.php");
+            echo '<script type="text/javascript">
+                window.location = "admin/applications.php";
+            </script>';
         } else {
             if (isset($_SESSION['admin_id']))
                 unset($_SESSION['admin_id']);
-            header("Location: student/info.php");
+            echo '<script type="text/javascript">
+                window.location = "student/info.php";
+              </script>';
         }
     } else {
+        require "utils/notification.php";
         makeToast("Invalid email or password.", false);
     }
 }
@@ -42,6 +45,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
+    <link rel="icon" href="tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
     <style>
         body {

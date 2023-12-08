@@ -2,65 +2,7 @@
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
 require "../utils/notification.php";
-
-// select all entities from a table
-function getAllRecords($conn, $tableName)
-{
-    $sql = "SELECT * FROM $tableName";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
-// update a table given the table name and a dict of values
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
-    $updateValues = '';
-    $id_key = '';
-
-    // parse value pairs
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
-            $id_key = $column;
-            continue;
-        }
-        if ($value != '') {
-            $updateValues .= "$column = '$value', ";
-        }
-    }
-    $updateValues = rtrim($updateValues, ', ');
-
-    $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error updating record: " . $conn->error, false);
-    } else {
-        makeToast("Event successfully updated", true);
-    }
-}
-
-// insert into given table name with dict of values
-function addRecord($conn, $tableName, $recordData)
-{
-    foreach ($recordData as $key => $value) {
-        if ($value == "add_new") {
-            unset($recordData[$key]);
-        }
-    }
-    $columns = implode(', ', array_keys($recordData));
-    $values = "'" . implode("', '", array_values($recordData)) . "'";
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error adding new record: " . $conn->error, false);
-    } else {
-        makeToast("New event added", true);
-    }
-}
+require "../utils/helpers.php";
 
 // check if page was psoted to
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -75,6 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $recordData['event_id'] = $_POST['selected_record_id'];
                 $recordData['event_name'] = $_POST['record_name'];
                 $recordData['event_location'] = $_POST['record_loc'];
+                $recordData['new_prog'] = $_POST['prog_id'];
                 break;
             default:
                 // default case
@@ -116,6 +59,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 // get all records from each table
 $events = getAllRecords($conn, 'events');
+$programs = getAllRecords($conn, 'programs');
 ?>
 
 <!DOCTYPE html>
@@ -123,6 +67,7 @@ $events = getAllRecords($conn, 'events');
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
@@ -173,6 +118,7 @@ $events = getAllRecords($conn, 'events');
                 <th>Id</th>
                 <th>Name</th>
                 <th>Location</th>
+                <th>Program Name</th>
                 <th>Attendance</th>
                 <th></th>
             </tr>
@@ -183,6 +129,7 @@ $events = getAllRecords($conn, 'events');
                 echo "<td><span>{$event['event_id']}</span></td>";
                 echo "<td><span>{$event['event_name']}</span></td>";
                 echo "<td><span>{$event['event_location']}</span></td>";
+                echo "<td>", $conn->execute_query('SELECT prog_name FROM programs WHERE prog_id = ?', [$event['prog_id']])->fetch_assoc()['prog_name'], "</td>";
                 echo "<td>", $conn->execute_query('SELECT count(user_id) as count FROM attendedevents WHERE event_id = ?', [$event['event_id']])->fetch_assoc()['count'], " people </td>";
                 echo "<td><a href='event_attendance.php?id={$event['event_id']}' style='right:0px;position:'><button class='btn btn-dark'>Edit attendance</button></a></td>";
                 echo "</tr>";
@@ -212,10 +159,18 @@ $events = getAllRecords($conn, 'events');
             <input type="text" name="record_name"><br>
             <label>Event Location:</label>
             <input type="text" name="record_loc"><br>
+            <label>Event Program:</label>
+            <select name="prog_id">
+                <?php
+                foreach ($programs as $program) {
+                    echo "<option value='{$program['prog_id']}'>{$program['prog_id']} - {$program['prog_name']}</option>";
+                }
+                ?>
+            </select>
 
-            <br>
+            <br><br>
             <button type="submit" name="update_record" class="btn btn-dark">Update/Add</button>
-            <button type="submit" name="delete_record" class="btn btn-dark">Delete</button>
+            <button type="submit" name="delete_record" class="btn btn-danger">Delete</button>
         </form>
     </section>
     <?php

@@ -1,6 +1,7 @@
 <?php
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
+require "../utils/helpers.php";
 
 // get count of rows from table name
 function getTableRowCount($conn, $tableName)
@@ -14,31 +15,50 @@ function getTableRowCount($conn, $tableName)
     return $row['count'];
 }
 
-// select all entities from a table
-function getAllRecords($conn, $tableName)
-{
-    $sql = "SELECT * FROM $tableName";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
 function generateProgramReport($conn, $prog_id)
 {
-    $sql = "SELECT 
+    $sql = "
+    SELECT 
+        p.prog_id,
+        COALESCE(en.enrolled_students, 0) AS enrolled_students,
+        COALESCE(ev.total_events, 0) AS total_events,
+        AVG(COALESCE(ae.attendance_count, 0)) AS average_attendance
+    FROM 
+        programs p
+    LEFT JOIN (
+        SELECT 
+            e.prog_id,
+            COUNT(DISTINCT ae.user_id) AS attendance_count
+        FROM 
+            events e
+        LEFT JOIN 
+            attendedevents ae ON ae.event_id = e.event_id
+        GROUP BY 
+            e.prog_id
+    ) ae ON p.prog_id = ae.prog_id
+    LEFT JOIN (
+        SELECT 
+            pe.prog_id,
             COUNT(DISTINCT pe.user_id) AS enrolled_students
-            FROM 
-                programenrollments pe
-            JOIN 
-                programs p ON pe.prog_id = p.prog_id
-            WHERE 
-                p.prog_id = $prog_id";
+        FROM 
+            programenrollments pe
+        GROUP BY 
+            pe.prog_id
+    ) en ON p.prog_id = en.prog_id
+    LEFT JOIN (
+        SELECT 
+            prog_id,
+            COUNT(*) AS total_events
+        FROM 
+            events
+        GROUP BY 
+            prog_id
+    ) ev ON p.prog_id = ev.prog_id
+    WHERE 
+        p.prog_id = $prog_id
+    GROUP BY 
+        p.prog_id;
+    ";
     $result = $conn->query($sql);
     return $result->fetch_all(MYSQLI_ASSOC);
 }
@@ -138,6 +158,7 @@ $programs = getAllRecords($conn, 'programs');
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
@@ -249,13 +270,12 @@ $programs = getAllRecords($conn, 'programs');
                 <?php
                 // list out all of the programs that have been created
                 foreach ($programs as $program) {
-                    echo "<option value='program_{$program['prog_id']}'>Number of students in the {$program['prog_name']} program</option>";
+                    echo "<option value='program_{$program['prog_id']}'>{$program['prog_name']} Program Participation Report</option>";
                 }
                 ?>
                 <option value="report_complete_all">Number of students to complete all course and certification
                     opportunities</option>
                 <option value="report_minority">Minority participation</option>
-                <option value="report_k_12_sc">Number of K-12 students enrolled in summer camps</option>
                 <option value="report_fed_interns">Number of students pursuing federal internships</option>
                 <option value="report_majors">Student majors</option>
                 <option value="report_intern_locs">Student internship locations</option>

@@ -15,25 +15,3 @@ if ($conn->connect_error) {
 // echo "Connected successfully";
 
 ?>
-<style>
-    /* Cool hack to pad every page */
-    section {
-        padding: 1em;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th,
-    td {
-        border: 1px solid #ddd !important;
-        padding: 8px;
-    }
-
-    th {
-        background-color: #500000 !important;
-        color: white;
-    }
-</style>

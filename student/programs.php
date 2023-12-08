@@ -2,168 +2,9 @@
 require '../utils/connect.php';
 require '../utils/middleware.php';
 require "../utils/notification.php";
+require "../utils/helpers.php";
 
 $id = $_SESSION['user_id'];
-
-$sql = "SELECT * FROM users WHERE user_id = '$id'";
-$result = $conn->query($sql);
-$row = $result->fetch_assoc();
-
-$stu_row = $conn->query("SELECT * FROM students WHERE user_id = '$id'")->fetch_assoc();
-
-function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_on = null)
-{
-    if ($join_table && $join_on) {
-        $sql = "SELECT * FROM $tableName
-                JOIN $join_table ON $tableName.$join_on = $join_table.$join_on
-                WHERE $tableName.user_id = '$id'";
-    } elseif ($id) {
-        $sql = "SELECT * FROM $tableName WHERE user_id = '$id'";
-    } else {
-        $sql = "SELECT * FROM $tableName";
-    }
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
-    $updateValues = '';
-    $keyValues = '';
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
-            $keyValues .= "$column = '$value' AND ";
-        } elseif ($value != '') {
-            $column = fixJoinTableVariables($column);
-            $updateValues .= "$column = '$value', ";
-        }
-    }
-    $updateValues = rtrim($updateValues, ', ');
-    $keyValues = rtrim($keyValues, 'AND ');
-
-    $sql = "UPDATE $tableName SET $updateValues WHERE $keyValues";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error updating record: " . $conn->error, false);
-    } else {
-        makeToast("Entry in $tableName updated", true);
-    }
-}
-
-function addRecord($conn, $tableName, $recordData)
-{
-    $fixedRecordData = array();
-    foreach ($recordData as $columnName => $value) {
-        $fixedColumnName = fixJoinTableVariables($columnName);
-        $fixedRecordData[$fixedColumnName] = $value;
-    }
-    $columns = implode(', ', array_keys($fixedRecordData));
-    $filteredValues = array_filter(array_values($recordData), function ($value) {
-        return $value !== "add_new";
-    });
-
-    $values = "'" . implode("', '", $filteredValues) . "'";
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error adding new record: " . $conn->error, false);
-    } else {
-        makeToast("New entry to $tableName added", true);
-    }
-}
-
-function fixJoinTableVariables($columnName)
-{
-    // jank fix for joined tables
-    if ($columnName == "new_cour") {
-        return "cour_id";
-    } elseif ($columnName == "new_intshp") {
-        return "intshp_id";
-    } else {
-        return $columnName;
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    if (isset($_POST['update_record'])) {
-        $selectedRecordId = $_POST['selected_record_id'] != null ? $_POST['selected_record_id'] : "add_new";
-        $recordData = array();
-
-        // handle data based on selected table
-        switch ($_POST['selected_table']) {
-            case 'takencourses':
-                $recordData['cour_id'] = $_POST['selected_record_id'];
-                $recordData['new_cour'] = $_POST['new_cour'];
-                $recordData['user_id'] = $id;
-                $recordData['tc_semester'] = $_POST['tc_semester'];
-                $recordData['tc_is_passed'] = $_POST['tc_is_passed'];
-                break;
-            case 'studentinternships':
-                $recordData['intshp_id'] = $_POST['selected_record_id'];
-                $recordData['new_intshp'] = $_POST['new_intshp'];
-                $recordData['user_id'] = $id;
-                $recordData['stin_app_status'] = $_POST['app_status'];
-                break;
-            case 'internships':
-                $recordData['intshp_name'] = $_POST['intshp_name'];
-                $recordData['intshp_year'] = $_POST['intshp_year'];
-                $recordData['intshp_state'] = $_POST['intshp_state'];
-                $recordData['intshp_country'] = $_POST['intshp_country'];
-                $recordData['intshp_is_federal'] = $_POST['intshp_is_federal'];
-                break;
-            default:
-                // default case
-                echo "Invalid table selected";
-                break;
-        }
-
-        // if add_new its a new record
-        if ($selectedRecordId == 'add_new') {
-            addRecord($conn, $_POST['selected_table'], $recordData);
-        } else {
-            // update existing record
-            updateRecord($conn, $_POST['selected_table'], $selectedRecordId, $recordData);
-        }
-    } elseif (isset($_POST['delete_record'])) {
-        $selectedRecordId = $_POST['selected_record_id'];
-        $selectedTable = $_POST['selected_table'];
-        if ($selectedRecordId == 'add_new') {
-            // show an alert when trying to delete 'add new'
-            makeToast("Cannot delete a new record.", false);
-        } else {
-            switch ($_POST['selected_table']) {
-                case 'takencourses':
-                    $sql = "DELETE FROM $selectedTable WHERE cour_id = $selectedRecordId AND user_id = $id";
-                    break;
-                case 'studentinternships':
-                    $sql = "DELETE FROM $selectedTable WHERE intshp_id = $selectedRecordId AND user_id = $id";
-                    break;
-                default:
-                    // default case
-                    echo "Invalid table selected";
-                    break;
-            }
-            if ($conn->query($sql) !== TRUE) {
-                makeToast("Error deleting record: " . $conn->error, false);
-            } else {
-                makeToast("$selectedTable record deleted", true);
-            }
-        }
-    }
-}
-
-// get all record from the table for the user
-$takencourses = getAllRecords($conn, 'takencourses', $id, 'courses', 'cour_id');
-$courses = getAllRecords($conn, 'courses');
-$applications = getAllRecords($conn, 'applications', $id);
-$studentinternships = getAllRecords($conn, 'studentinternships', $id, 'internships', 'intshp_id');
-$internships = getAllRecords($conn, 'internships');
-
 ?>
 
 <!DOCTYPE html>
@@ -171,6 +12,7 @@ $internships = getAllRecords($conn, 'internships');
 
 <head>
     <title>Student Information</title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 

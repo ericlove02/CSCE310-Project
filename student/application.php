@@ -37,9 +37,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
 
     if ($result) {
         makeToast("Application submitted successfully", true);
-
-
-        header("Location: programs.php");
+        echo '<script type="text/javascript">
+            window.location = "programs.php";
+        </script>';
     } else {
         makeToast("Error submitting application: " . $conn->error, false);
     }
@@ -52,7 +52,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
 
     if ($result) {
         makeToast("Application deleted successfully", true);
-        header("Location: programs.php");
+        echo '<script type="text/javascript">
+            window.location = "programs.php";
+        </script>';
     } else {
         makeToast("Error deleting application: " . $conn->error, false);
     }
@@ -89,6 +91,7 @@ $conn->close();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Program Application</title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
     <style>
         body {

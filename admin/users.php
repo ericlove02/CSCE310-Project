@@ -2,6 +2,7 @@
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
 require "../utils/notification.php";
+require "../utils/helpers.php";
 
 // switch to new account from users button press
 if (@$_POST['doChangeUser']) {
@@ -10,74 +11,10 @@ if (@$_POST['doChangeUser']) {
     $_SESSION['admin_id'] = $_SESSION['user_id'];
     // store the user id that they are checking out
     $_SESSION['user_id'] = $_POST['user_id'];
-    header("Location: ../student/info.php");
+    echo '<script type="text/javascript">
+            window.location = "../student/info.php";
+        </script>';
     return;
-}
-
-// reset their user id when returning from switched profile
-if (isset($_SESSION['admin_id'])) {
-    $_SESSION['user_id'] = $_SESSION['admin_id'];
-    unset($_SESSION['admin_id']);
-}
-
-// select all entities from a table
-function getAllRecords($conn, $tableName)
-{
-    $sql = "SELECT * FROM $tableName";
-    $result = $conn->query($sql);
-    if (!$result) {
-        die("Query failed: " . $conn->error);
-    }
-    $records = array();
-    while ($row = $result->fetch_assoc()) {
-        $records[] = $row;
-    }
-    return $records;
-}
-
-// update a table given the table name and a dict of values
-function updateRecord($conn, $tableName, $recordId, $recordData)
-{
-    $updateValues = '';
-    $id_key = '';
-
-    // parse value pairs
-    foreach ($recordData as $column => $value) {
-        if (strpos($column, '_id') !== false) {
-            $id_key = $column;
-            continue;
-        }
-        if ($value != '') {
-            $updateValues .= "$column = '$value', ";
-        }
-    }
-    $updateValues = rtrim($updateValues, ', ');
-
-    $sql = "UPDATE $tableName SET $updateValues WHERE $id_key=$recordId";
-    if ($conn->query($sql) !== TRUE) {
-        echo "Error updating record: " . $conn->error;
-        makeToast("Error updating record: " . $conn->error, false);
-    } else {
-        makeToast("user successfully updated", true);
-    }
-}
-
-// insert into given table name with dict of values
-function addRecord($conn, $tableName, $recordData)
-{
-    foreach ($recordData as $key => $value) {
-        if ($value == "add_new") {
-            unset($recordData[$key]);
-        }
-    }
-    $columns = implode(', ', array_keys($recordData));
-    $values = "'" . implode("', '", array_values($recordData)) . "'";
-    $sql = "INSERT INTO $tableName ($columns) VALUES ($values)";
-    if ($conn->query($sql) !== TRUE) {
-        makeToast("Error adding new record: " . $conn->error, false);
-    } else {
-        makeToast("New user successfully added", true);
-    }
 }
 
 // check if page was psoted to
@@ -132,9 +69,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     break;
             }
             if ($conn->query($sql) !== TRUE) {
-                echo "Error deleting record: " . $conn->error;
+                makeToast("Error deleting record: " . $conn->error, false);
             } else {
-                echo "$selectedTable record deleted";
+                makeToast("$selectedTable record deleted", true);
             }
         }
     }
@@ -151,6 +88,7 @@ $users = getAllRecords($conn, 'users');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
