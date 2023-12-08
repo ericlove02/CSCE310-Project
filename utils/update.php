@@ -78,5 +78,7 @@ if ($conn->execute_query($sql, $userValues) === TRUE && $conn->execute_query($sq
     echo "Error updating record: " . $conn->error;
 }
 
+header("Location: /student/info.php");
+
 $conn->close();
 ?>
