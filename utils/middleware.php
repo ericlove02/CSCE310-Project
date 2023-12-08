@@ -1,4 +1,5 @@
 <?php
+session_start();
 function access_denied()
 {
     echo '<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">';
@@ -15,7 +16,6 @@ function access_denied()
     </div>';
 }
 
-session_start();
 if (!isset($_SESSION['user_id'])) {
     access_denied();
     exit;

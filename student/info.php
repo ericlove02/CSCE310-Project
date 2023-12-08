@@ -24,15 +24,8 @@ if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
 <html>
 
 <head>
-    <title>
-        <?php
-        if ($stu_row) {
-            echo "Student Page";
-        } else {
-            echo "Admin Page";
-        }
-        ?>
-    </title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
+    <title>Student Information</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
