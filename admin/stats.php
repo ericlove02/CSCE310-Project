@@ -1,8 +1,8 @@
 <?php
 /**
  * Main Author: Eric Love
- * Co-Author: Mateo Ruiz 
  * Co-Author: Andrew Nguyen
+ * Co-Author: Mateo Ruiz 
  */
 
 require_once "../utils/connect.php";
