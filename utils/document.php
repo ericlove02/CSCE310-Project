@@ -1,9 +1,9 @@
 <?php
-
+/**
+ * Main Author: Joel Herzog 
+ */
 /* Handle uploading, downloading, and deleting user documents */
 /*
-
-
 GET methods:
 /utils/document.php?serve=<file_id>
 /utils/document.php?delete=<file_id>

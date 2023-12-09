@@ -1,5 +1,15 @@
 <?php
+/**
+ * Main Author: Mateo Ruiz 
+ * Co-Author: Eric Love
+ */
 
+/**
+ * Fetches an application from the database
+ * @param $user_id the user id of the application
+ * @param $prog_id the program id of the application
+ * @return application
+ */
 function fetch_application($user_id, $prog_id)
 {
     require '../utils/connect.php';
@@ -17,8 +27,12 @@ require '../utils/middleware.php';
 require '../utils/connect.php';
 require "../utils/notification.php";
 
-// check if post request was made
-if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
+/**
+ * Handles requests to this page
+ * Takes in a POST request with a req_type of PUT or DELETE
+ * Or a GET request with user_id session 
+ */
+if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") { 
     $prog_id = $_POST['prog_id'];
     $user_id = $_POST['user_id'];
     $purpose_statement = $_POST['purpose_statement'];

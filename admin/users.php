@@ -1,4 +1,9 @@
 <?php
+/**
+ * Main Author: Eric Love
+ * Co-Author: Mateo Ruiz 
+ */
+
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
 require "../utils/notification.php";
@@ -89,7 +94,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn->rollBack();
                 makeToast("Error: " . $e->getMessage(), false);
             }
-            return;
         }
     }
 }

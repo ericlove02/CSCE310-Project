@@ -1,4 +1,9 @@
 <?php
+/**
+ * Main Author: Eric Love
+ * Co-Author: Joel Herzogg
+ */
+
 $servername = "localhost";  // Usually "localhost" if the database is on the same server as your PHP script
 $username = "root"; // user for server: id21543832_root
 $password = ""; // pw for server: Password1!

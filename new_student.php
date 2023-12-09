@@ -1,4 +1,10 @@
 <?php
+/**
+ * Main Author: Joel Herzog 
+ * Co-Author: Eric Love
+ * Co-Author: Mateo Ruiz  
+ */
+
 session_start();
 require_once "utils/connect.php";
 
