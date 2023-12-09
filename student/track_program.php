@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
             // Insert into studentcerts table
             $sql = "INSERT INTO studentcerts (cert_id, user_id, sc_date_started, sc_date_completed, sc_affliliated_program_id)
-            VALUES ('$selectedRecordId', '$userId', '$currentDate', '', '$prog_id')";
+            VALUES ('$selectedRecordId', '$userId', '$currentDate', NULL, '$prog_id')";
             // Execute the SQL query
             $conn->query($sql);
         } else {
