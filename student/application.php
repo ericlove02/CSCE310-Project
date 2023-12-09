@@ -32,7 +32,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_POST['req_type'] == "PUT") {
         $result = $sql->execute([$purpose_statement, $oncom_cert, $com_cert]);
     }
 
-    $sql = $conn->prepare("INSERT INTO APPLICATIONS (prog_id, user_id, app_purpose_statement, uncom_cert, com_cert) VALUES ($prog_id, $user_id, ?, ?, ?);");
+    $sql = $conn->prepare("INSERT INTO applications (prog_id, user_id, app_purpose_statement, uncom_cert, com_cert) VALUES ($prog_id, $user_id, ?, ?, ?);");
     $result = $sql->execute([$purpose_statement, $oncom_cert, $com_cert]);
 
     if ($result) {
