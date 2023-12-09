@@ -59,20 +59,37 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             // show an alert when trying to delete 'add new'
             makeToast("Error: Cannot delete a new record.", false);
         } else {
-            switch ($_POST['selected_table']) {
-                case 'users':
-                    $sql = "DELETE FROM $selectedTable WHERE user_id = $selectedRecordId";
-                    break;
-                default:
-                    // default case
-                    makeToast("Invalid table selected", false);
-                    break;
+            $tables = [
+                'applications',
+                'attendedevents',
+                'programenrollments',
+                'studentcerts',
+                'studentinternships',
+                'takencourses',
+                'user_documents',
+                'students',
+                'users'
+            ];
+
+            try {
+                $conn->begin_transaction();
+
+                foreach ($tables as $table) {
+                    $sql = "DELETE FROM $table WHERE user_id = ?";
+                    $stmt = $conn->prepare($sql);
+                    $stmt->bind_param('i', $selectedRecordId);
+                    if (!$stmt->execute()) {
+                        throw new Exception("Failed to delete records from $table");
+                    }
+                }
+
+                $conn->commit();
+                makeToast("User records deleted successfully", true);
+            } catch (Exception $e) {
+                $conn->rollBack();
+                makeToast("Error: " . $e->getMessage(), false);
             }
-            if ($conn->query($sql) !== TRUE) {
-                makeToast("Error deleting record: " . $conn->error, false);
-            } else {
-                makeToast("$selectedTable record deleted", true);
-            }
+            return;
         }
     }
 }
