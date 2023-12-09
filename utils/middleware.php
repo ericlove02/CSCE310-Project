@@ -1,4 +1,8 @@
 <?php
+/**
+ * Author: Mateo Ruiz
+ * Co-Author: Eric Love
+ */
 session_start();
 function access_denied()
 {

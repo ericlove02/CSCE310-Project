@@ -1,4 +1,12 @@
 <?php
+/**
+ * Main Author: Joel Herzog
+ * Co-Author: Andrew Nguyen
+ * Co-Author: Eric Love 
+ * Co-Author: Andrew Nguyen 
+ * Co-Author: Mateo Ruiz
+ */
+
 session_start();
 
 require 'connect.php';

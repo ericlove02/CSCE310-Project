@@ -1,4 +1,8 @@
 <?php
+/**
+ * Main Author: Mateo Ruiz
+ * Co-Author: Eric Love
+ */
 function makeToast($message, $success)
 {
     if (!$success) {

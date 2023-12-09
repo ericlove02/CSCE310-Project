@@ -1,4 +1,9 @@
 <?php
+/**
+ * Main-Author: Eric Love
+ * Co-Author: Mateo Ruiz 
+ */
+
 require '../utils/connect.php';
 require '../utils/middleware.php';
 require "../utils/notification.php";

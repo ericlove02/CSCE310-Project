@@ -1,4 +1,10 @@
 <?php
+/**
+ * Main Author: Eric Love
+ * Co-Author: Mateo Ruiz 
+ * Co-Author: Andrew Nguyen
+ */
+
 require_once "../utils/connect.php";
 require_once "../utils/middleware.php";
 require "../utils/helpers.php";

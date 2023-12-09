@@ -1,4 +1,8 @@
 <?php
+/**
+ * Main Author: Eric Love
+ */
+
 session_start();
 
 // Unset all session variables

@@ -1,4 +1,8 @@
 <?php
+/**
+ *  Main Author: Eric Love
+ */
+
 function getAllRecords($conn, $tableName, $id = null, $join_table = null, $join_on = null)
 {
     if ($join_table && $join_on) {
