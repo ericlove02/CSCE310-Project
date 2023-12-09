@@ -65,10 +65,6 @@ $stuUpdates = substr($stuUpdates, 0, -2);
 $sql = "UPDATE users SET " . $userUpdates . " WHERE user_id = $id;";
 $sql2 = "UPDATE students SET " . $stuUpdates . " WHERE user_id = $id";
 
-
-echo $sql, "<br>";
-echo $sql2;
-
 // header("Location: ../student/info.php");
 if ($conn->execute_query($sql, $userValues) === TRUE && $conn->execute_query($sql2, $stuValues) === TRUE) {
     echo "Record updated successfully";
