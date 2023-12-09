@@ -88,6 +88,7 @@ $internships = getAllRecords($conn, 'internships');
 
 <head>
     <title>Student Information</title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 

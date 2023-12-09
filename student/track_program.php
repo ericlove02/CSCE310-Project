@@ -91,6 +91,7 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
 
 <head>
     <meta charset="UTF-8">
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Track Program Page</title>
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
@@ -204,7 +205,9 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
         </section>
         <br>
         <section>
-            <h4>Attended Events associated to <?php echo $prog_name ?></h4>
+            <h4>Attended Events associated to
+                <?php echo $prog_name ?>
+            </h4>
             <?php
             // Fetch attended events
             $sqlAttendedEvents = "SELECT * FROM events e JOIN attendedevents ae ON e.event_id = ae.event_id WHERE ae.user_id = $userId AND e.prog_id = $prog_id";
@@ -221,10 +224,18 @@ $certifications = $result->fetch_all(MYSQLI_ASSOC);
                 </tr>
                 <?php foreach ($attendedEvents as $event) { ?>
                     <tr>
-                        <td><?php echo $event['event_name']; ?></td>
-                        <td><?php echo $event['prog_id']; ?></td>
-                        <td><?php echo $event['event_id']; ?></td>
-                        <td><?php echo $event['event_location']; ?></td>
+                        <td>
+                            <?php echo $event['event_name']; ?>
+                        </td>
+                        <td>
+                            <?php echo $event['prog_id']; ?>
+                        </td>
+                        <td>
+                            <?php echo $event['event_id']; ?>
+                        </td>
+                        <td>
+                            <?php echo $event['event_location']; ?>
+                        </td>
                     </tr>
                 <?php } ?>
             </table>

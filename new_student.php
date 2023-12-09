@@ -1,7 +1,6 @@
 <?php
-require_once "utils/connect.php";
-
 session_start();
+require_once "utils/connect.php";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $email = $_POST["email"]; // Email
@@ -49,12 +48,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
     // create the user
-    $conn->execute_query("INSERT INTO Users(user_id, email, password, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,?,?,FALSE)", [$stu_uin, $email, $password, $f_name, $l_name, $m_initial, $phone]);
+    $conn->execute_query("INSERT INTO users(user_id, email, password, f_name, l_name, m_initial, phone, is_admin) VALUES (?,?,?,?,?,?,?,FALSE)", [$stu_uin, $email, $password, $f_name, $l_name, $m_initial, $phone]);
     echo "User created successfully<br>";
 
     // insert into students
     $stu_result = $conn->execute_query(
-        "INSERT INTO STUDENTS VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+        "INSERT INTO students VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
         [$stu_uin, $stu_gender, $stu_hisp_latino, $stu_uscitizen, $stu_firstgen, $stu_dob, $stu_discord, $stu_school, $stu_classification, $stu_grad_expect, $stu_major, $stu_major2, $stu_minor, $stu_minor2, $stu_gpa, $stu_in_rotc, $stu_in_corp, $stu_in_cyber_club, $stu_in_women_cyber]
     );
 
@@ -66,7 +65,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $_SESSION["user_id"] = $stu_uin;
     $_SESSION["password"] = $password;
     $_SESSION["is_admin"] = false;
-    header("Location: student.php");
+    echo '<script type="text/javascript">
+        window.location = "student/info.php";
+      </script>';
 }
 
 $conn->close();
@@ -116,6 +117,7 @@ function createSelection($key, $label, $assoc_name_value)
 
 <head>
     <title>New student</title>
+    <link rel="icon" href="tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 <style>

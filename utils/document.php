@@ -18,9 +18,9 @@ POST / file upload:
 </form>
 
 */
-
-require_once "connect.php";
 session_start();
+require_once "connect.php";
+
 $id = $_SESSION['user_id'];
 
 if (@$_GET['serve'] != NULL) {
@@ -33,7 +33,7 @@ if (@$_GET['serve'] != NULL) {
         header("Content-type: $mime"); // application/pdf
         header("Content-Disposition: inline; filename=\"$filename\"");
 
-        echo $row['data'];
+        // echo $row['data'];
     } else {
         die("File not found");
     }
@@ -49,12 +49,12 @@ if (@$_POST['fileUpload'] != NULL) {
             if ($_POST['submit'] == 'Delete File') {
                 $result = $conn->execute_query("DELETE FROM user_documents WHERE file_id = ?", [$_POST['selectedFileId']]);
                 if ($result) {
-                    echo "File deleted successfully";
+                    // echo "File deleted successfully";
                 }
             } else {
                 $sql = "UPDATE user_documents SET data = ?, filename = ?, mimetype = ? WHERE file_id = ?";
                 $result = $conn->execute_query($sql, [file_get_contents($file['tmp_name']), $file['name'], $file['type'], $_POST['selectedFileId']]);
-                echo 'Sucessfully updated file';
+                // echo 'Sucessfully updated file';
                 if ($result !== TRUE) {
                     die("Failed to upload file");
                 }

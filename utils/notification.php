@@ -1,7 +1,8 @@
 <?php
-    function makeToast($message, $success) {
-        if (!$success) {
-            echo '<script>
+function makeToast($message, $success)
+{
+    if (!$success) {
+        echo '<script>
             toastr.options = {
                 "timeOut": "5000",
                 "extendedTimeOut": "1000",
@@ -11,10 +12,10 @@
                 toastr.error("' . $message . '");
             });
             </script>';
-            return;
-        }
+        return;
+    }
 
-        echo '<script>
+    echo '<script>
         toastr.options = {
             "timeOut": "5000",
             "extendedTimeOut": "1000",
@@ -24,8 +25,8 @@
             toastr.success("' . $message . '");
         });
         </script>';
-        return; 
-    }
+    return;
+}
 
 echo '
 <script src="http://code.jquery.com/jquery-1.9.1.min.js"></script>

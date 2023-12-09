@@ -11,7 +11,9 @@ if (@$_POST['doChangeUser']) {
     $_SESSION['admin_id'] = $_SESSION['user_id'];
     // store the user id that they are checking out
     $_SESSION['user_id'] = $_POST['user_id'];
-    header("Location: ../student/info.php");
+    echo '<script type="text/javascript">
+            window.location = "../student/info.php";
+        </script>';
     return;
 }
 
@@ -86,6 +88,7 @@ $users = getAllRecords($conn, 'users');
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Page</title>
+    <link rel="icon" href="../tamu.ico" type="image/x-icon">
     <link rel="stylesheet" href="/bootstrap-5.0.2-dist/css/bootstrap.min.css">
 </head>
 
