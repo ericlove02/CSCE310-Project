@@ -40,10 +40,10 @@ foreach ($_POST as $key => $value) {
             }
 
             $conn->commit();
-            echo "User records deleted successfully";
+            // echo "User records deleted successfully";
         } catch (Exception $e) {
             $conn->rollBack();
-            echo "Error: " . $e->getMessage();
+            // echo "Error: " . $e->getMessage();
         }
         header("Location: logout.php");
         return;
