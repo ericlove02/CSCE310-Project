@@ -89,7 +89,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $conn->rollBack();
                 makeToast("Error: " . $e->getMessage(), false);
             }
-            return;
         }
     }
 }
