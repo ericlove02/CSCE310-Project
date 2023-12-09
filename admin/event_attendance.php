@@ -1,7 +1,7 @@
 <?php
 /**
- * Main Author: Eric Love
- * Co-Author: Joel Herzog
+ * Main Author: Joel Herzog 
+ * Co-Author: Eric Love 
  * Co-Author: Mateo Ruiz
  */
 
