@@ -95,6 +95,11 @@ if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
                     $val = $row[$key];
                     echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"text\" class=\"form-control\" name=\"${key}\" value=\"${val}\"></div>";
                 }
+                function createDate($row, $key, $label, $bootstrapClass = null)
+                {
+                    $val = $row[$key];
+                    echo "<div class=\"form-group ${bootstrapClass}\">${label}: <input type=\"date\" class=\"form-control\" name=\"${key}\" value=\"${val}\"></div>";
+                }
 
                 function createCheckbox($row, $key, $label)
                 {
@@ -125,7 +130,7 @@ if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
                     <div class="form-row row">
                         <?php
                         createInput($stu_row, "stu_gender", "Gender", "col-md-4");
-                        createInput($stu_row, "stu_dob", "Date of Birth", "col-md-4");
+                        createDate($stu_row, "stu_dob", "Date of Birth", "col-md-4");
                         ?>
                     </div>
                     <?php
@@ -138,7 +143,7 @@ if (isset($_SESSION['update_success']) && $_SESSION['update_success']) {
                         createInput($stu_row, "stu_discord", "Discord username", "col-md-3");
                         createInput($stu_row, "stu_school", "School", "col-md-4");
                         createInput($stu_row, "stu_classification", "Student classification", "col-md-3");
-                        createInput($stu_row, "stu_grad_expect", "Expected graduation date", "col-md-2");
+                        createDate($stu_row, "stu_grad_expect", "Expected graduation date", "col-md-2");
                         ?>
                     </div>
                     <div class="form-row row">
